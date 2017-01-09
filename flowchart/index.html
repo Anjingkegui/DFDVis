@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Flow Chart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="js/jquery/jquery-3.1.1.min.js"></script>
+    <script src="js/jquery-ui/jquery-ui.min.js"></script>
+    <script src="js/d3.js"></script>
+    <script src="js/jquery.panzoom/dist/jquery.panzoom.min.js"></script>
+    <script src="js/jquery-mousewheel/jquery.mousewheel.min.js"></script>
+    <script src="js/jquery.flowchart.js"></script>
+    <link rel="stylesheet" href="stylesheets/jquery.flowchart.css">
+    <link rel="stylesheet" href="stylesheets/custom.css">
+</head>
+
+<body>
+    <div class="flowchart-example">
+        <h4>DFD</h4>
+        <div class="flowchart-example-container" id="example_8"></div>
+        <button class="create_operator">Create operator</button>
+        <button class="delete_selected_button">Delete selected operator / link</button>
+        <button class="mode_1">O->O</button>
+        <button class="mode_2">O->M</button>
+        <button class="mode_3">M->O</button>
+        <div>
+            <div id="operator_properties">
+                <label for="operator_title">Operator's title: </label>
+                <input type="text" id="operator_title" />
+            </div>
+            <div id="link_properties">
+                <label for="link_title">Link's title: </label>
+                <input type="text" id="link_title" />
+            </div>
+            <script type="text/javascript">
+            $(document).ready(function() {
+                var initTop = 20;
+                var initLeft = 20;
+                var operatorI = 1;
+                var data = {
+                    operators: {
+                        operator1: {
+                            top: initTop,
+                            left: initLeft,
+                            properties: {
+                                title: 'Operator ' + operatorI,
+                                inputs: {
+                                    ins: {
+                                        label: 'Input',
+                                        multiple: true
+                                    }
+                                },
+                                outputs: {
+                                    output_1: {
+                                        label: 'Output',
+                                        multiple: true
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    links: {}
+                };
+
+                var $operatorProperties = $('#operator_properties');
+                var $linkProperties = $('link_properties');
+
+                var $operatorTitle = $('#operator_title');
+                var $linkTitle = $('#link_title');
+
+
+                // Apply the plugin on a standard, empty div...
+                var $flowchart = $('#example_8');
+                $flowchart.flowchart({
+                    data: data,
+                    onOperatorSelect: function(operatorId) {
+                        $operatorProperties.show();
+                        $operatorTitle.val($flowchart.flowchart('getOperatorTitle', operatorId));
+                        return true;
+                    },
+                    onOperatorUnselect: function() {
+                        $operatorProperties.hide();
+                        return true;
+                    },
+                    onLinkSelect: function(linkId) {
+                        console.log(linkId);
+                        $linkProperties.show();
+                        return true;
+                    },
+                    onLinkUnselect: function() {
+                        $linkProperties.hide();
+                        return true;
+                    }
+                });
+
+                initTop = initTop + 20;
+                initLeft = initLeft + 20;
+                operatorI++;
+
+                $operatorTitle.keyup(function() {
+                    var selectedOperatorId = $flowchart.flowchart('getSelectedOperatorId');
+                    if (selectedOperatorId != null) {
+                        $flowchart.flowchart('setOperatorTitle', selectedOperatorId, $operatorTitle.val());
+                    }
+                });
+                $linkTitle.keyup(function() {
+                    var selectedLinkId = $flowchart.flowchart('getSelectedLinkId');
+                    if (selectedLinkId != null) {
+                        $flowchart.flowchart('setLinkTitle', selectedLinkId, $linkTitle.val());
+                    }
+                });
+
+                $flowchart.siblings('.create_operator').click(function() {
+                    var operatorId = 'created_operator_' + operatorI;
+                    var operatorData = {
+                        top: initTop,
+                        left: initLeft,
+                        properties: {
+                            title: 'Operator ' + operatorI,
+                            inputs: {
+                                ins: {
+                                    label: 'Input',
+                                    multiple: true
+                                }
+                            },
+                            outputs: {
+                                output_1: {
+                                    label: 'Output',
+                                    multiple: true
+                                }
+                            }
+                        }
+                    };
+
+                    initTop = initTop + 20;
+                    initLeft = initLeft + 20;
+                    operatorI++;
+
+                    $flowchart.flowchart('createOperator', operatorId, operatorData);
+                });
+
+                $flowchart.siblings('.delete_selected_button').click(function() {
+                    $flowchart.flowchart('deleteSelected');
+                });
+
+
+
+                $flowchart.siblings('.mode_1').click(function() {
+                    $flowchart.flowchart('mode1');
+                });
+
+                $flowchart.siblings('.mode_2').click(function() {
+                    $flowchart.flowchart('mode2');
+                });
+
+                $flowchart.siblings('.mode_3').click(function() {
+                    $flowchart.flowchart('mode3');
+                });
+            });
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>
