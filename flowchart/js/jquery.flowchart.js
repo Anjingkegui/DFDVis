@@ -305,8 +305,8 @@ $(function() {
         getLinkTitle: function(linkId) {
             var title = this.options.defaultLinkTitle;
             var linkData = this.data.links[linkId];
-            if (typeof linkData.title != 'undefined') {
-                title = linkData.title;
+            if (typeof linkData.internal.els.text != 'undefined') {
+                title = linkData.internal.els.text;
             }
             return title;
         },
@@ -340,14 +340,10 @@ $(function() {
 
             linkData.internal.els.fromSmallConnector = fromSmallConnector;
             linkData.internal.els.toSmallConnector = toSmallConnector;
-            linkData.internal.els.Title = title;
-
 
             var overallGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
             this.objs.layers.links[0].appendChild(overallGroup);
             linkData.internal.els.overallGroup = overallGroup;
-
-
 
             var mask = document.createElementNS("http://www.w3.org/2000/svg", "mask");
             var maskId = "fc_mask_" + this.globalId + "_" + this.maskNum;
@@ -367,8 +363,6 @@ $(function() {
             group.setAttribute('data-link_id', linkId);
             overallGroup.appendChild(group);
 
-
-
             var shape_path = document.createElementNS("http://www.w3.org/2000/svg", "path");
             shape_path.setAttribute("stroke-width", this.options.linkWidth.toString());
             shape_path.setAttribute("fill", "none");
@@ -382,10 +376,12 @@ $(function() {
             linkData.internal.els.rect = shape_rect;
 
             var path_text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            path_text.textContent = linkData.internal.els.Title.toString();
+            path_text.textContent = this.options.defaultLinkTitle;
+            path_text.setAttribute("id", "link_name" + linkId.toString());
             path_text.setAttribute("fill", "black");
             group.appendChild(path_text);
             linkData.internal.els.path_text = path_text;
+            linkData.internal.els.text = path_text.textContent;
 
             this._refreshLinkPositions(linkId);
             this.uncolorizeLink(linkId);
@@ -463,7 +459,6 @@ $(function() {
             linkData.internal.els.rect.setAttribute("height", this.options.linkWidth);
         },
 
-        //MLX: 疑似与operator命名绑定的代码，变量operatorData传入时为data.operators[operatorId]，即某个operator对象
         getOperatorCompleteData: function(operatorData) {
             if (typeof operatorData.internal == 'undefined') {
                 operatorData.internal = {};
@@ -486,20 +481,6 @@ $(function() {
                     }
                 }
             }
-
-            if (typeof infos.class == 'undefined') {
-                infos.class = this.options.defaultOperatorClass;
-            }
-            return infos;
-        },
-
-        //MLX: 仿照getOperatorData写的函数，变量operatorData传入时为data.operators[operatorId]，即某个operator对象
-        getLinkCompleteData: function(operatorData) {
-            if (typeof operatorData.internal == 'undefined') {
-                operatorData.internal = {};
-            }
-            this._refreshInternalProperties2(operatorData);
-            var infos = $.extend(true, {}, operatorData.internal.properties);
 
             if (typeof infos.class == 'undefined') {
                 infos.class = this.options.defaultOperatorClass;
@@ -567,46 +548,6 @@ $(function() {
                     addConnector(key_o, infos.outputs[key_o], $operator_outputs, 'outputs');
                 }
             }
-
-            return fullElement;
-        },
-
-        //MLX: 仿照——getOperatorElement写的函数，未完成
-        _getLinkFullElement: function(operatorData) {
-            var infos = this.getLinkCompleteData(operatorData);
-
-            var $link = $('<div class="flowchart-link"></div>');
-            $operator.addClass(infos.class);
-
-            var $operator_title = $('<div class="flowchart-link-title"></div>');
-            $operator_title.html(infos.title);
-            $operator_title.appendTo($operator);
-
-            var $operator_inputs_outputs = $('<div class="flowchart-operator-inputs-outputs"></div>');
-
-            $operator_inputs_outputs.appendTo($operator);
-
-            var $operator_inputs = $('<div class="flowchart-operator-inputs"></div>');
-            $operator_inputs.appendTo($operator_inputs_outputs);
-
-            var $operator_outputs = $('<div class="flowchart-operator-outputs"></div>');
-            $operator_outputs.appendTo($operator_inputs_outputs);
-
-            var self = this;
-
-            var connectorArrows = {};
-            var connectorSmallArrows = {};
-            var connectorSets = {};
-            var connectors = {};
-
-            var fullElement = {
-                operator: $operator,
-                title: $operator_title,
-                connectorSets: connectorSets,
-                connectors: connectors,
-                connectorArrows: connectorArrows,
-                connectorSmallArrows: connectorSmallArrows
-            };
 
             return fullElement;
         },
@@ -1064,12 +1005,8 @@ $(function() {
 
         //MLX: 仿照上一个函数写的setLinkTitle
         setLinkTitle: function(linkId, title) {
-            this.data.links[linkId].internal.els.title.html(title);
-            if (typeof this.data.links[linkId].properties == 'undefined') {
-                this.data.links[linkId].properties = {};
-            }
-            this.data.links[linkId].properties.title = title;
-            this._refreshInternalProperties2(this.data.links[linkId]);
+            this.data.links[linkId].internal.els.text = title;
+            this._refreshLinkTitle(linkId);
             this.options.onAfterChange('link_title_change');
         },
 
@@ -1117,25 +1054,18 @@ $(function() {
             }
         },
 
-        getLinkFullProperties: function(operatorData) {
-            if (typeof operatorData.type != 'undefined') {
-                var typeProperties = this.data.linkTypes[operatorData.type];
-                var linkProperties = {};
-                if (typeof operatorData.properties != 'undefined') {
-                    linkProperties = operatorData.properties;
-                }
-                return $.extend({}, typeProperties, linkProperties);
-            } else {
-                return operatorData.properties;
-            }
-        },
-
         _refreshInternalProperties: function(operatorData) {
             operatorData.internal.properties = this.getOperatorFullProperties(operatorData);
         },
 
-        _refreshInternalProperties2: function(operatorData) {
-            operatorData.internal.properties = this.getLinkFullProperties(operatorData);
+        _refreshLinkTitle: function(linkId) {
+            var title = jQuery('#'+"link_name"+linkId.toString());
+            title[0].textContent = this.data.links[linkId].internal.els.text;
+        },
+
+        linkdone: function() {
+
+            return 0;
         }
     });
 });

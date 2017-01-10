@@ -16,13 +16,14 @@
 
 <body>
     <div class="flowchart-example">
-        <h4>DFD</h4>
+        <h2>DFD</h2>
         <div class="flowchart-example-container" id="example_8"></div>
         <button class="create_operator">Create operator</button>
         <button class="delete_selected_button">Delete selected operator / link</button>
         <button class="mode_1">O->O</button>
         <button class="mode_2">O->M</button>
         <button class="mode_3">M->O</button>
+        <button class="done">Done</button>
         <div>
             <div id="operator_properties">
                 <label for="operator_title">Operator's title: </label>
@@ -63,7 +64,7 @@
                 };
 
                 var $operatorProperties = $('#operator_properties');
-                var $linkProperties = $('link_properties');
+                var $linkProperties = $('#link_properties');
 
                 var $operatorTitle = $('#operator_title');
                 var $linkTitle = $('#link_title');
@@ -83,7 +84,6 @@
                         return true;
                     },
                     onLinkSelect: function(linkId) {
-                        console.log(linkId);
                         $linkProperties.show();
                         return true;
                     },
@@ -143,8 +143,6 @@
                     $flowchart.flowchart('deleteSelected');
                 });
 
-
-
                 $flowchart.siblings('.mode_1').click(function() {
                     $flowchart.flowchart('mode1');
                 });
@@ -155,6 +153,10 @@
 
                 $flowchart.siblings('.mode_3').click(function() {
                     $flowchart.flowchart('mode3');
+                });
+                
+                $flowchart.siblings('.done').click(function() {
+                    $flowchart.flowchart('linkdone');
                 });
             });
             </script>
