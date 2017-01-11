@@ -2,16 +2,19 @@
 <html lang="en">
 
 <head>
-    <title>Flow Chart</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFDVis</title>
+
     <script src="js/jquery/jquery-3.1.1.min.js"></script>
     <script src="js/jquery-ui/jquery-ui.min.js"></script>
-    <script src="js/d3.js"></script>
+    <script src="js/bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/d3/d3.js"></script>
     <script src="js/jquery.panzoom/dist/jquery.panzoom.min.js"></script>
     <script src="js/jquery-mousewheel/jquery.mousewheel.min.js"></script>
+    <!--******************************-->
     <script src="js/jquery.flowchart.js"></script>
-    <link rel="stylesheet" href="stylesheets/jquery.flowchart.css">
-    <link rel="stylesheet" href="stylesheets/custom.css">
+    <!--******************************-->
+    <link rel="stylesheet" href="js/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="stylesheets/flowchart.css">
 </head>
 
 <body>
@@ -155,7 +158,7 @@
                 $flowchart.siblings('.mode_3').click(function() {
                     $flowchart.flowchart('mode3');
                 });
-                
+
                 $flowchart.siblings('.done').click(function() {
                     $flowchart.flowchart('linkdone');
                 });
