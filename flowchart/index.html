@@ -78,6 +78,8 @@
                 var $flowchart = $('#example_8');
                 $flowchart.flowchart({
                     data: data,
+
+                    //这四个函数在这里设置是要保持对operator_properties、link_properties等元素的操作
                     onOperatorSelect: function(operatorId) {
                         $operatorProperties.show();
                         $operatorTitle.val($flowchart.flowchart('getOperatorTitle', operatorId));
@@ -114,6 +116,8 @@
                     }
                 });
 
+                //.siblings(selector)
+                //siblings() 获得匹配集合中每个元素的同胞，通过选择器进行筛选是可选的
                 $flowchart.siblings('.create_operator').click(function() {
                     var operatorId = 'created_operator_' + operatorI;
                     var operatorData = {
