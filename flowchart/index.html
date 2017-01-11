@@ -16,7 +16,7 @@
 
 <body>
     <div class="flowchart-example">
-        <h2>DFD</h2>
+        <h2>DFD Generation Interface</h2>
         <div class="flowchart-example-container" id="example_8"></div>
         <button class="create_operator">Create operator</button>
         <button class="delete_selected_button">Delete selected operator / link</button>
@@ -24,6 +24,7 @@
         <button class="mode_2">O->M</button>
         <button class="mode_3">M->O</button>
         <button class="done">Done</button>
+        <button class="submit">Submit </button>
         <div>
             <div id="operator_properties">
                 <label for="operator_title">Operator's title: </label>
@@ -35,8 +36,8 @@
             </div>
             <script type="text/javascript">
             $(document).ready(function() {
-                var initTop = 20;
-                var initLeft = 20;
+                var initTop = 300;
+                var initLeft = 100;
                 var operatorI = 1;
                 var data = {
                     operators: {
@@ -157,6 +158,10 @@
                 
                 $flowchart.siblings('.done').click(function() {
                     $flowchart.flowchart('linkdone');
+                });
+
+                $flowchart.siblings('.submit').click(function() {
+                    $flowchart.flowchart('submit');
                 });
             });
             </script>

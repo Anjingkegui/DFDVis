@@ -65,6 +65,7 @@ $(function() {
         positionRatio: 1,
         globalId: null,
         mode: 1,
+        record: 0,
 
         // the constructor
         _create: function() {
@@ -211,8 +212,16 @@ $(function() {
             while (typeof this.data.links[this.linkNum] != 'undefined') {
                 this.linkNum++;
             }
-
+            if (this.mode != 1) {
+                this.record = 1;
+            }
             this.createLink(this.linkNum, linkData);
+            if (this.record == 1) {
+                if (typeof this.data.record == "undefined") {
+                    this.data.record = [];
+                }
+                this.data.record.push(this.linkNum);
+            }
             return this.linkNum;
         },
 
@@ -249,8 +258,8 @@ $(function() {
             }
 
             this.data.links[linkId] = linkData;
+            this.data.links[linkId].siblings = [];
             this._drawLink(linkId);
-
             this.options.onAfterChange('link_create');
         },
 
@@ -314,7 +323,7 @@ $(function() {
         //MLX: 划线部分相关代码（定义fromOperator和toOperator）
         _drawLink: function(linkId) {
             var linkData = this.data.links[linkId];
-            linkData.mode=this.mode;
+            linkData.mode = this.mode;
 
             if (typeof linkData.internal == 'undefined') {
                 linkData.internal = {};
@@ -325,6 +334,27 @@ $(function() {
             var fromConnectorId = linkData.fromConnector;
             var toOperatorId = linkData.toOperator;
             var toConnectorId = linkData.toConnector;
+
+
+            if (linkData.mode == 2) {
+                if (typeof this.data.dictionary_3 == "undefined") {
+                    this.data.dictionary_3 = new Array();
+                }
+                if (!!this.data.dictionary_3[fromOperatorId] == false) {
+                    this.data.dictionary_3[fromOperatorId] = 1;
+                }
+                linkData.OMNum = this.data.dictionary_3[fromOperatorId];
+            }
+
+            if (linkData.mode == 3) {
+                if (typeof this.data.dictionary_4 == "undefined") {
+                    this.data.dictionary_4 = new Array();
+                }
+                if (!!this.data.dictionary_4[toOperatorId] == false) {
+                    this.data.dictionary_4[toOperatorId] = 1;
+                }
+                linkData.MONum = this.data.dictionary_4[toOperatorId];
+            }
 
             var subConnectors = this._getSubConnectors(linkData);
             var fromSubConnector = subConnectors[0];
@@ -376,7 +406,7 @@ $(function() {
             linkData.internal.els.rect = shape_rect;
 
             var path_text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            path_text.textContent = this.options.defaultLinkTitle;
+            path_text.textContent = this.options.defaultLinkTitle + " " + String(linkId);
             path_text.setAttribute("id", "link_name" + linkId.toString());
             path_text.setAttribute("fill", "black");
             group.appendChild(path_text);
@@ -401,6 +431,25 @@ $(function() {
             return [fromSubConnector, toSubConnector];
         },
 
+        calc: function (int) {
+            switch (int % 5) {
+                case 0:
+                    return 2;
+                    break;
+                case 1:
+                    return 3;
+                    break;
+                case 2:
+                    return 5;
+                    break;
+                case 3:
+                    return 1;
+                    break;
+                default:
+                    return 4;
+            }
+        }, 
+
         //MLX:SVG划线代码（包括三种模式切换）
         _refreshLinkPositions: function(linkId) {
             var linkData = this.data.links[linkId];
@@ -419,9 +468,6 @@ $(function() {
             var toX = toPosition.x;
             var toY = toPosition.y;
 
-            var toX2 = fromX + 100;
-            var toX3 = toX - 100;
-
             fromY += this.options.linkVerticalDecal;
             toY += this.options.linkVerticalDecal;
 
@@ -439,18 +485,25 @@ $(function() {
                 linkData.internal.els.path.setAttribute("d", 'M' + bezierFromX + ',' + (fromY) + ' C' + (fromX + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + fromY + ' ' + (toX - bezierIntensity) + ',' + toY + ' ' + bezierToX + ',' + toY);
                 linkData.internal.els.path_text.setAttribute("x", fromX + (toX - fromX) / 2);
                 linkData.internal.els.path_text.setAttribute("y", fromY + (toY - fromY) / 2 - 10);
+                linkData.type = "OO";
             }
 
             if (linkData.mode == 2) {
-                linkData.internal.els.path.setAttribute("d", 'M' + bezierFromX + ',' + (fromY) + ' C' + (fromX + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + fromY + ' ' + (toX2 - bezierIntensity) + ',' + fromY + ' ' + toX2 + ',' + fromY + 'M' + (toX2) + ',' + (fromY) + 'C' + (toX2 + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + fromY + ' ' + (toX - bezierIntensity) + ',' + toY + ' ' + bezierToX + ',' + toY);
+                var toX2 = fromX + 100 * Math.sin(Math.PI/6*this.calc(linkData.OMNum));
+                var toY2 = fromY - 100 * Math.cos(Math.PI/6*this.calc(linkData.OMNum));
+                linkData.internal.els.path.setAttribute("d", 'M' + bezierFromX + ',' + (fromY) + ' C' + (fromX + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + fromY + ' ' + (toX2 - bezierIntensity) + ',' + toY2 + ' ' + toX2 + ',' + toY2 + 'M' + (toX2) + ',' + (toY2) + 'C' + (toX2 + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + toY2 + ' ' + (toX - bezierIntensity) + ',' + toY + ' ' + bezierToX + ',' + toY);
                 linkData.internal.els.path_text.setAttribute("x", fromX + 100 + (toX - fromX - 100) / 2);
                 linkData.internal.els.path_text.setAttribute("y", fromY + (toY - fromY) / 2 - 10);
+                linkData.type = "OM";
             }
 
             if (linkData.mode == 3) {
-                linkData.internal.els.path.setAttribute("d", 'M' + bezierFromX + ',' + (fromY) + ' C' + (fromX + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + fromY + ' ' + (toX3 - bezierIntensity) + ',' + toY + ' ' + toX3 + ',' + toY + 'M' + (toX3) + ',' + (toY) + 'C' + (toX3 + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + toY + ' ' + (toX3 - bezierIntensity) + ',' + toY + ' ' + bezierToX + ',' + toY);
+                var toX3 = toX - 100 * Math.sin(Math.PI/6*this.calc(linkData.MONum));
+                var toY3 = toY - 100 * Math.cos(Math.PI/6*this.calc(linkData.MONum));
+                linkData.internal.els.path.setAttribute("d", 'M' + bezierFromX + ',' + (fromY) + ' C' + (fromX + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + fromY + ' ' + (toX3 - bezierIntensity) + ',' + toY3 + ' ' + toX3 + ',' + toY3 + 'M' + (toX3) + ',' + (toY3) + 'C' + (toX3) + ',' + toY3 + ' ' + (toX - bezierIntensity) + ',' + toY + ' ' + bezierToX + ',' + toY);
                 linkData.internal.els.path_text.setAttribute("x", fromX + (toX - 100 - fromX) / 2);
                 linkData.internal.els.path_text.setAttribute("y", fromY + (toY - fromY) / 2 - 10);
+                linkData.type = "MO";
             }
 
             linkData.internal.els.rect.setAttribute("x", fromX);
@@ -707,6 +760,7 @@ $(function() {
             }
             if (connectorCategory == 'inputs' && this.lastOutputConnectorClicked != null) {
                 var linkData = {
+                    Title: this.options.defaultLinkTitle,
                     fromOperator: this.lastOutputConnectorClicked.operator,
                     fromConnector: this.lastOutputConnectorClicked.connector,
                     fromSubConnector: this.lastOutputConnectorClicked.subConnector,
@@ -877,6 +931,16 @@ $(function() {
             this._deleteOperator(operatorId, false);
         },
 
+        deleteSiblings: function(siblings, linkId) {
+            var temp = [];
+            for (var i = 0; i < siblings.length; i++) {
+                if (siblings[i] != linkId) {
+                    temp.push(siblings[i]);
+                }
+            }
+            return temp;
+        },
+
         _deleteOperator: function(operatorId, replace) {
             if (!this.options.onOperatorDelete(operatorId, replace)) {
                 return false;
@@ -885,7 +949,26 @@ $(function() {
                 for (var linkId in this.data.links) {
                     if (this.data.links.hasOwnProperty(linkId)) {
                         var currentLink = this.data.links[linkId];
-                        if (currentLink.fromOperator == operatorId || currentLink.toOperator == operatorId) {
+                        if (currentLink.fromOperator == operatorId) {
+                            var id = currentLink.toOperator;
+                            if (currentLink.type == "MO" && !!this.data.dictionary_2[id]) {                            
+                                var siblingArray = this.data.dictionary_2[id];
+                                for (var i = 0; i < siblingArray.length; i++) {
+                                    this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
+                                }
+                                this.data.dictionary_2[id] = this.deleteSiblings(this.data.dictionary_2[id], linkId);
+                            } 
+                            this._deleteLink(linkId, true);
+                        }
+                        if(currentLink.toOperator == operatorId) {
+                            var id = currentLink.fromOperator;
+                            if (currentLink.type == "OM" && !!this.data.dictionary_1[id]) { 
+                                var siblingArray = this.data.dictionary_1[id];
+                                for (var i = 0; i < siblingArray.length; i++) {
+                                    this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
+                                }
+                                this.data.dictionary_1[id] = this.deleteSiblings(this.data.dictionary_1[id], linkId);
+                            }  
                             this._deleteLink(linkId, true);
                         }
                     }
@@ -913,12 +996,31 @@ $(function() {
                     return;
                 }
             }
+
             this.colorizeLink(linkId, 'transparent');
             var linkData = this.data.links[linkId];
             var fromOperator = linkData.fromOperator;
             var fromConnector = linkData.fromConnector;
             var toOperator = linkData.toOperator;
             var toConnector = linkData.toConnector;
+
+
+            if (linkData.type == "OM" && !!this.data.dictionary_1[fromOperator]) {
+                var siblingArray = this.data.dictionary_1[fromOperator];
+                for (var i = 0; i < siblingArray.length; i++) {
+                    this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
+                    this.data.dictionary_1[fromOperator] = this.deleteSiblings(this.data.dictionary_1[fromOperator], linkId);
+                }
+            }
+
+            else if (linkData.type == "MO" && !!this.data.dictionary_2[toOperator]) {
+                var siblingArray = this.data.dictionary_2[toOperator];
+                    for (var i = 0; i < siblingArray.length; i++) {
+                    this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
+                    this.data.dictionary_2[toOperator] = this.deleteSiblings(this.data.dictionary_2[toOperator], linkId);
+                }
+            }
+
             linkData.internal.els.overallGroup.remove();
             delete this.data.links[linkId];
 
@@ -984,10 +1086,12 @@ $(function() {
 
         mode2: function() {
             this.mode = 2;
+            this.record = 1;
         },
 
         mode3: function() {
             this.mode = 3;
+            this.record = 1;
         },
 
 
@@ -1006,6 +1110,7 @@ $(function() {
         //MLX: 仿照上一个函数写的setLinkTitle
         setLinkTitle: function(linkId, title) {
             this.data.links[linkId].internal.els.text = title;
+            this.data.links[linkId].Title = title;
             this._refreshLinkTitle(linkId);
             this.options.onAfterChange('link_title_change');
         },
@@ -1061,11 +1166,150 @@ $(function() {
         _refreshLinkTitle: function(linkId) {
             var title = jQuery('#'+"link_name"+linkId.toString());
             title[0].textContent = this.data.links[linkId].internal.els.text;
+        }, 
+
+/*
+        getReturnValue: function (linkData) {          
+            var Report = [];
+            var i = 0;
+             for (i = 0; i <= this.linkNum; i++) {
+                var link = linkData[i];
+                if (typeof link != "undefined" && link.type == "OO") {
+                    var $name = this.getLinkTitle(i);
+                    var $mode = "OO";
+                    var fromOperatorId = link.fromOperator;
+                    var $head = this.getOperatorTitle(fromOperatorId); 
+                    var toOperatorId = link.toOperator;
+                    var $tail = this.getOperatorTitle(toOperatorId);
+                }
+                else if (typeof link != "undefined" && link.type == "OM") {
+                    var $name = [];
+                    var $mode = "OM";
+                    var fromOperatorId = link.fromOperator;
+                    var $head = this.getOperatorTitle(fromOperatorId);  
+                    var $tail = [];
+                    for (var j = 0; j < link.siblings.length; j++) {
+                        $name.push(this.getLinkTitle(link.siblings[j]));
+                        var toOperatorId = linkData[link.siblings[j]].toOperator;
+                        $tail.push(this.getOperatorTitle(toOperatorId));                        
+                    }
+                    for (var j = 0; j < link.siblings.length; j++) {
+                        delete linkData[link.siblings[j]];
+                    }
+                }
+                else if (typeof link != "undefined" && link.type == "MO") {
+                    var $name = [];
+                    var $mode = "MO";
+                    var toOperatorId = link.toOperator;
+                    var $head = [];  
+                    var $tail = this.getOperatorTitle(toOperatorId);
+                    for (var j = 0; j < link.siblings.length; j++) {
+                        $name.push(this.getLinkTitle(link.siblings[j]));
+                        var fromOperatorId = linkData[link.siblings[j]].fromOperator;
+                        $head.push(this.getOperatorTitle(fromOperatorId));
+                    }
+                    for (var j = 0; j < link.siblings.length; j++) {
+                        delete linkData[link.siblings[j]];
+                    }
+                }
+                if (typeof link != "undefined") {
+                    var report = {
+                    name: $name,
+                    type: $mode,
+                    head: $head,
+                    tail: $tail,
+                };
+                Report.push(report);
+                }
+            } 
+            return Report;
+        },
+*/
+        addSiblings:  function (linkArray) {
+             for (var i = 0; i < linkArray.length; i++) {
+                for (var j = 0; j < linkArray.length; j++) {
+                    this.data.links[linkArray[i]].siblings.push (linkArray[j]);
+                }
+            }
         },
 
         linkdone: function() {
+            if (this.mode == 2 && this.data.record.length > 0) {
+                if (typeof this.data.dictionary_1 == "undefined") {
+                    this.data.dictionary_1 = new Array();
+                }
+                if (typeof this.data.dictionary_3 == "undefined") {
+                    this.data.dictionary_3 = new Array();
+                }
+                var fromOperatorId = this.data.links[this.data.record[0]].fromOperator; 
+                if (!!this.data.dictionary_1[fromOperatorId]) {            
+                    var id = this.data.dictionary_1[fromOperatorId];
+                    for (var i = 0; i < this.data.record.length; i++) {
+                        id.push(this.data.record[i]);
+                    }
+                    this.data.dictionary_1[fromOperatorId] = id;
+                }
+                else {
+                    this.data.dictionary_1[fromOperatorId] = this.data.record;
+                }
+                this.addSiblings (this.data.record);
 
-            return 0;
+                if (!!this.data.dictionary_3[fromOperatorId]) {
+                    this.data.dictionary_3[fromOperatorId]++;
+                }
+            }
+
+            if (this.mode == 3 && this.data.record.length > 0) {
+                if (typeof this.data.dictionary_2 == "undefined") {
+                    this.data.dictionary_2 = new Array();
+                }
+                if (typeof this.data.dictionary_4 == "undefined") {
+                    this.data.dictionary_4 = new Array();
+                }
+                var toOperatorId = this.data.links[this.data.record[0]].toOperator;
+                if (!!this.data.dictionary_2[toOperatorId]) {
+                    var id = this.data.dictionary_2[toOperatorId]; 
+                    for (var i = 0; i < this.data.record.length; i++) {
+                        id.push(this.data.record[i]);
+                    }
+                    this.data.dictionary_2[toOperatorId] = id;
+                }
+                else {
+                    this.data.dictionary_2[toOperatorId] = this.data.record;          
+                }
+                this.addSiblings (this.data.record); 
+                if (!!this.data.dictionary_4[toOperatorId]) {
+                    this.data.dictionary_4[toOperatorId]++;
+                }  
+            }
+
+            this.data.record = [];
+            this.record = 0;
+        },
+
+        submit: function () {
+            this.data.dictionary = new Array();        
+            for (var i = 0; i <= this.linkNum; i++) {
+                if (typeof this.data.links[i] != "undefined" && typeof this.data.links[i].siblings != "undefined") {
+                    if (!!this.data.dictionary[this.getLinkTitle(i)]) {
+                        alert ("Link names repeat! Please fix the link names");
+                        return;
+                    }
+                    else {
+                        this.data.dictionary[this.getLinkTitle(i)] = i;
+                        console.log(this.getLinkTitle(i) + ": " + this.data.links[i].type + " " + this.data.links[i].siblings);
+                    }                   
+                }
+            }
+            console.log("******************************");
+            delete this.data.dictionary;
+            //var linkData = [];
+            //linkData = this.data.links; 
+           // this.data.report = this.getReturnValue(linkData);
+           // for (var i = 0; i < this.data.report.length; i++) {
+               // console.log("name: "+this.data.report[i].name+" type: "+this.data.report[i].type+" head: "+this.data.report[i].head+" tail: "+this.data.report[i].tail);
+           // }
         }
+
     });
 });
