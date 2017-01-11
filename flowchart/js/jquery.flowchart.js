@@ -1287,22 +1287,13 @@ $(function() {
             this.record = 0;
         },
 
-        submit: function () {
-            this.data.dictionary = new Array();        
+        submit: function () {       
             for (var i = 0; i <= this.linkNum; i++) {
                 if (typeof this.data.links[i] != "undefined" && typeof this.data.links[i].siblings != "undefined") {
-                    if (!!this.data.dictionary[this.getLinkTitle(i)]) {
-                        alert ("Link names repeat! Please fix the link names");
-                        return;
-                    }
-                    else {
-                        this.data.dictionary[this.getLinkTitle(i)] = i;
-                        console.log(this.getLinkTitle(i) + ": " + this.data.links[i].type + " " + this.data.links[i].siblings);
-                    }                   
+                    console.log(this.getLinkTitle(i) + ": " + this.data.links[i].type + " " + this.data.links[i].siblings);                   
                 }
             }
             console.log("******************************");
-            delete this.data.dictionary;
             //var linkData = [];
             //linkData = this.data.links; 
            // this.data.report = this.getReturnValue(linkData);
