@@ -91,6 +91,7 @@
                     },
                     onLinkSelect: function(linkId) {
                         $linkProperties.show();
+                        $linkTitle.val($flowchart.flowchart('getLinkTitle', linkId));
                         return true;
                     },
                     onLinkUnselect: function() {
