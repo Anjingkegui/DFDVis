@@ -298,9 +298,7 @@ $(function() {
         getLinkMainColor: function(linkId) {
             var color = this.options.defaultLinkColor;
             var linkData = this.data.links[linkId];
-            if (typeof linkData.color != 'undefined') {
-                color = linkData.color;
-            }
+            
             return color;
         },
 
@@ -1168,11 +1166,10 @@ $(function() {
             title[0].textContent = this.data.links[linkId].internal.els.text;
         }, 
 
-/*
+
         getReturnValue: function (linkData) {          
             var Report = [];
-            var i = 0;
-             for (i = 0; i <= this.linkNum; i++) {
+             for (var i = 0; i <= this.linkNum; i++) {
                 var link = linkData[i];
                 if (typeof link != "undefined" && link.type == "OO") {
                     var $name = this.getLinkTitle(i);
@@ -1224,7 +1221,7 @@ $(function() {
             } 
             return Report;
         },
-*/
+
         addSiblings:  function (linkArray) {
              for (var i = 0; i < linkArray.length; i++) {
                 for (var j = 0; j < linkArray.length; j++) {
@@ -1288,18 +1285,12 @@ $(function() {
         },
 
         submit: function () {       
-            for (var i = 0; i <= this.linkNum; i++) {
-                if (typeof this.data.links[i] != "undefined" && typeof this.data.links[i].siblings != "undefined") {
-                    console.log(this.getLinkTitle(i) + ": " + this.data.links[i].type + " " + this.data.links[i].siblings);                   
-                }
+            var linkData = [];
+            linkData = $.extend(true, {}, this.data.links); 
+            this.data.report = this.getReturnValue(linkData);
+            for (var i = 0; i < this.data.report.length; i++) {
+                console.log("name: "+this.data.report[i].name+" type: "+this.data.report[i].type+" head: "+this.data.report[i].head+" tail: "+this.data.report[i].tail);
             }
-            console.log("******************************");
-            //var linkData = [];
-            //linkData = this.data.links; 
-           // this.data.report = this.getReturnValue(linkData);
-           // for (var i = 0; i < this.data.report.length; i++) {
-               // console.log("name: "+this.data.report[i].name+" type: "+this.data.report[i].type+" head: "+this.data.report[i].head+" tail: "+this.data.report[i].tail);
-           // }
         }
 
     });
