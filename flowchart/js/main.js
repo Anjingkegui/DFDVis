@@ -35,7 +35,7 @@ $(document).ready(function() {
     var $operatorTitle = $('#operator_title');
     var $linkTitle = $('#link_title');
 
-    var $flowchart = $('#example_8');
+    var $flowchart = $('#flowchartdiv');
     $flowchart.flowchart({
         data: data,
 
@@ -60,6 +60,7 @@ $(document).ready(function() {
         }
     });
 
+    //默认新增了一个节点
     initTop = initTop + 20;
     initLeft = initLeft + 20;
     operatorI++;
@@ -102,6 +103,7 @@ $(document).ready(function() {
             }
         };
 
+        //新增了一个节点后改变这些基础计数
         initTop = initTop + 20;
         initLeft = initLeft + 20;
         operatorI++;
