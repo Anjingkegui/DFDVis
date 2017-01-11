@@ -1,4 +1,6 @@
 $(document).ready(function() {
+
+    //初始化流图输入部分
     var initTop = 300;
     var initLeft = 100;
     var operatorI = 1;
@@ -33,8 +35,6 @@ $(document).ready(function() {
     var $operatorTitle = $('#operator_title');
     var $linkTitle = $('#link_title');
 
-
-    // Apply the plugin on a standard, empty div...
     var $flowchart = $('#example_8');
     $flowchart.flowchart({
         data: data,
@@ -79,8 +79,9 @@ $(document).ready(function() {
 
     //.siblings(selector)
     //siblings() 获得匹配集合中每个元素的同胞，通过选择器进行筛选是可选的
+    //这里给button绑定事件和时间处理函数
     $flowchart.siblings('.create_operator').click(function() {
-        var operatorId = 'created_operator_' + operatorI;
+        var operatorId = 'operator' + operatorI;
         var operatorData = {
             top: initTop,
             left: initLeft,
