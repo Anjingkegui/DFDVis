@@ -431,7 +431,7 @@ $(function() {
             return [fromSubConnector, toSubConnector];
         },
 
-        calc: function (int) {
+        calc: function(int) {
             switch (int % 5) {
                 case 0:
                     return 2;
@@ -448,7 +448,7 @@ $(function() {
                 default:
                     return 4;
             }
-        }, 
+        },
 
         //MLX:SVG划线代码（包括三种模式切换）
         _refreshLinkPositions: function(linkId) {
@@ -489,8 +489,8 @@ $(function() {
             }
 
             if (linkData.mode == 2) {
-                var toX2 = fromX + 100 * Math.sin(Math.PI/6*this.calc(linkData.OMNum));
-                var toY2 = fromY - 100 * Math.cos(Math.PI/6*this.calc(linkData.OMNum));
+                var toX2 = fromX + 100 * Math.sin(Math.PI / 6 * this.calc(linkData.OMNum));
+                var toY2 = fromY - 100 * Math.cos(Math.PI / 6 * this.calc(linkData.OMNum));
                 linkData.internal.els.path.setAttribute("d", 'M' + bezierFromX + ',' + (fromY) + ' C' + (fromX + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + fromY + ' ' + (toX2 - bezierIntensity) + ',' + toY2 + ' ' + toX2 + ',' + toY2 + 'M' + (toX2) + ',' + (toY2) + 'C' + (toX2 + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + toY2 + ' ' + (toX - bezierIntensity) + ',' + toY + ' ' + bezierToX + ',' + toY);
                 linkData.internal.els.path_text.setAttribute("x", fromX + 100 + (toX - fromX - 100) / 2);
                 linkData.internal.els.path_text.setAttribute("y", fromY + (toY - fromY) / 2 - 10);
@@ -498,8 +498,8 @@ $(function() {
             }
 
             if (linkData.mode == 3) {
-                var toX3 = toX - 100 * Math.sin(Math.PI/6*this.calc(linkData.MONum));
-                var toY3 = toY - 100 * Math.cos(Math.PI/6*this.calc(linkData.MONum));
+                var toX3 = toX - 100 * Math.sin(Math.PI / 6 * this.calc(linkData.MONum));
+                var toY3 = toY - 100 * Math.cos(Math.PI / 6 * this.calc(linkData.MONum));
                 linkData.internal.els.path.setAttribute("d", 'M' + bezierFromX + ',' + (fromY) + ' C' + (fromX + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + fromY + ' ' + (toX3 - bezierIntensity) + ',' + toY3 + ' ' + toX3 + ',' + toY3 + 'M' + (toX3) + ',' + (toY3) + 'C' + (toX3) + ',' + toY3 + ' ' + (toX - bezierIntensity) + ',' + toY + ' ' + bezierToX + ',' + toY);
                 linkData.internal.els.path_text.setAttribute("x", fromX + (toX - 100 - fromX) / 2);
                 linkData.internal.els.path_text.setAttribute("y", fromY + (toY - fromY) / 2 - 10);
@@ -951,24 +951,24 @@ $(function() {
                         var currentLink = this.data.links[linkId];
                         if (currentLink.fromOperator == operatorId) {
                             var id = currentLink.toOperator;
-                            if (currentLink.type == "MO" && !!this.data.dictionary_2[id]) {                            
+                            if (currentLink.type == "MO" && !!this.data.dictionary_2[id]) {
                                 var siblingArray = this.data.dictionary_2[id];
                                 for (var i = 0; i < siblingArray.length; i++) {
                                     this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
                                 }
                                 this.data.dictionary_2[id] = this.deleteSiblings(this.data.dictionary_2[id], linkId);
-                            } 
+                            }
                             this._deleteLink(linkId, true);
                         }
-                        if(currentLink.toOperator == operatorId) {
+                        if (currentLink.toOperator == operatorId) {
                             var id = currentLink.fromOperator;
-                            if (currentLink.type == "OM" && !!this.data.dictionary_1[id]) { 
+                            if (currentLink.type == "OM" && !!this.data.dictionary_1[id]) {
                                 var siblingArray = this.data.dictionary_1[id];
                                 for (var i = 0; i < siblingArray.length; i++) {
                                     this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
                                 }
                                 this.data.dictionary_1[id] = this.deleteSiblings(this.data.dictionary_1[id], linkId);
-                            }  
+                            }
                             this._deleteLink(linkId, true);
                         }
                     }
@@ -1011,11 +1011,9 @@ $(function() {
                     this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
                     this.data.dictionary_1[fromOperator] = this.deleteSiblings(this.data.dictionary_1[fromOperator], linkId);
                 }
-            }
-
-            else if (linkData.type == "MO" && !!this.data.dictionary_2[toOperator]) {
+            } else if (linkData.type == "MO" && !!this.data.dictionary_2[toOperator]) {
                 var siblingArray = this.data.dictionary_2[toOperator];
-                    for (var i = 0; i < siblingArray.length; i++) {
+                for (var i = 0; i < siblingArray.length; i++) {
                     this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
                     this.data.dictionary_2[toOperator] = this.deleteSiblings(this.data.dictionary_2[toOperator], linkId);
                 }
@@ -1164,44 +1162,42 @@ $(function() {
         },
 
         _refreshLinkTitle: function(linkId) {
-            var title = jQuery('#'+"link_name"+linkId.toString());
+            var title = jQuery('#' + "link_name" + linkId.toString());
             title[0].textContent = this.data.links[linkId].internal.els.text;
-        }, 
+        },
 
 
-        getReturnValue: function (linkData) {          
+        getReturnValue: function(linkData) {
             var Report = [];
             var i = 0;
-             for (i = 0; i <= this.linkNum; i++) {
+            for (i = 0; i <= this.linkNum; i++) {
                 var link = linkData[i];
                 if (typeof link != "undefined" && link.type == "OO") {
                     var $name = this.getLinkTitle(i);
                     var $mode = "OO";
                     var fromOperatorId = link.fromOperator;
-                    var $head = this.getOperatorTitle(fromOperatorId); 
+                    var $head = this.getOperatorTitle(fromOperatorId);
                     var toOperatorId = link.toOperator;
                     var $tail = this.getOperatorTitle(toOperatorId);
-                }
-                else if (typeof link != "undefined" && link.type == "OM") {
+                } else if (typeof link != "undefined" && link.type == "OM") {
                     var $name = [];
                     var $mode = "OM";
                     var fromOperatorId = link.fromOperator;
-                    var $head = this.getOperatorTitle(fromOperatorId);  
+                    var $head = this.getOperatorTitle(fromOperatorId);
                     var $tail = [];
                     for (var j = 0; j < link.siblings.length; j++) {
                         $name.push(this.getLinkTitle(link.siblings[j]));
                         var toOperatorId = linkData[link.siblings[j]].toOperator;
-                        $tail.push(this.getOperatorTitle(toOperatorId));                        
+                        $tail.push(this.getOperatorTitle(toOperatorId));
                     }
                     for (var j = 0; j < link.siblings.length; j++) {
                         delete linkData[link.siblings[j]];
                     }
-                }
-                else if (typeof link != "undefined" && link.type == "MO") {
+                } else if (typeof link != "undefined" && link.type == "MO") {
                     var $name = [];
                     var $mode = "MO";
                     var toOperatorId = link.toOperator;
-                    var $head = [];  
+                    var $head = [];
                     var $tail = this.getOperatorTitle(toOperatorId);
                     for (var j = 0; j < link.siblings.length; j++) {
                         $name.push(this.getLinkTitle(link.siblings[j]));
@@ -1214,21 +1210,21 @@ $(function() {
                 }
                 if (typeof link != "undefined") {
                     var report = {
-                    name: $name,
-                    type: $mode,
-                    head: $head,
-                    tail: $tail,
-                };
-                Report.push(report);
+                        name: $name,
+                        type: $mode,
+                        head: $head,
+                        tail: $tail,
+                    };
+                    Report.push(report);
                 }
-            } 
+            }
             return Report;
         },
 
-        addSiblings:  function (linkArray) {
-             for (var i = 0; i < linkArray.length; i++) {
+        addSiblings: function(linkArray) {
+            for (var i = 0; i < linkArray.length; i++) {
                 for (var j = 0; j < linkArray.length; j++) {
-                    this.data.links[linkArray[i]].siblings.push (linkArray[j]);
+                    this.data.links[linkArray[i]].siblings.push(linkArray[j]);
                 }
             }
         },
@@ -1241,18 +1237,17 @@ $(function() {
                 if (typeof this.data.dictionary_3 == "undefined") {
                     this.data.dictionary_3 = new Array();
                 }
-                var fromOperatorId = this.data.links[this.data.record[0]].fromOperator; 
-                if (!!this.data.dictionary_1[fromOperatorId]) {            
+                var fromOperatorId = this.data.links[this.data.record[0]].fromOperator;
+                if (!!this.data.dictionary_1[fromOperatorId]) {
                     var id = this.data.dictionary_1[fromOperatorId];
                     for (var i = 0; i < this.data.record.length; i++) {
                         id.push(this.data.record[i]);
                     }
                     this.data.dictionary_1[fromOperatorId] = id;
-                }
-                else {
+                } else {
                     this.data.dictionary_1[fromOperatorId] = this.data.record;
                 }
-                this.addSiblings (this.data.record);
+                this.addSiblings(this.data.record);
 
                 if (!!this.data.dictionary_3[fromOperatorId]) {
                     this.data.dictionary_3[fromOperatorId]++;
@@ -1268,35 +1263,32 @@ $(function() {
                 }
                 var toOperatorId = this.data.links[this.data.record[0]].toOperator;
                 if (!!this.data.dictionary_2[toOperatorId]) {
-                    var id = this.data.dictionary_2[toOperatorId]; 
+                    var id = this.data.dictionary_2[toOperatorId];
                     for (var i = 0; i < this.data.record.length; i++) {
                         id.push(this.data.record[i]);
                     }
                     this.data.dictionary_2[toOperatorId] = id;
+                } else {
+                    this.data.dictionary_2[toOperatorId] = this.data.record;
                 }
-                else {
-                    this.data.dictionary_2[toOperatorId] = this.data.record;          
-                }
-                this.addSiblings (this.data.record); 
+                this.addSiblings(this.data.record);
                 if (!!this.data.dictionary_4[toOperatorId]) {
                     this.data.dictionary_4[toOperatorId]++;
-                }  
+                }
             }
 
             this.data.record = [];
             this.record = 0;
         },
 
-        submit: function () {       
+        submit: function() {
             var linkData = [];
-            linkData = $.extend(true, {}, this.data.links); 
+            linkData = $.extend(true, {}, this.data.links);
             this.data.report = this.getReturnValue(linkData);
             for (var i = 0; i < this.data.report.length; i++) {
-                console.log("name: "+this.data.report[i].name+" type: "+this.data.report[i].type+" head: "+this.data.report[i].head+" tail: "+this.data.report[i].tail);
+                console.log("name: " + this.data.report[i].name + " type: " + this.data.report[i].type + " head: " + this.data.report[i].head + " tail: " + this.data.report[i].tail);
             }
         }
 
     });
 });
-
-
