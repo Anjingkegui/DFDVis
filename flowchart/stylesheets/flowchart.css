@@ -111,10 +111,11 @@
 }
 
 .flowchart-operator.hover {
-    border-color: #999;
+    border: 1px solid #CCCCCC;
 }
 
 .flowchart-operator.selected {
+    border: 4px solid #CCCCCC;
 }
 
 .flowchart-operator .flowchart-operator-title {

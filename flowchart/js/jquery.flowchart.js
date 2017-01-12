@@ -12,7 +12,8 @@ $(function() {
             defaultLinkTitle: '',
             defaultLinkColor: 'black',
             defaultSelectedLinkColor: 'blue',
-            linkWidth: 3,
+            linkWidth: 2,
+            linkSelectedWidth: 3,
             grid: 20,
             multipleLinksOnOutput: true,
             multipleLinksOnInput: true,
@@ -76,7 +77,7 @@ $(function() {
 
         dictionary_4: new Array(),		// 字典数据结构，以节点为key，保存该节点下MO连线的主干连线的数量
         								// 调用linkdone()函数之后递增，用于MO主干连线角度的设定，被_refreshLinkPositions()函数调用
-        								
+
         report: [],						// 保存每一次的调用getReturnValue()函数的返回值
 
         // the constructor
@@ -821,6 +822,7 @@ $(function() {
                 return;
             }
             this.unselectLink();
+            
             this._removeSelectedClassOperators();
             this._addSelectedClass(operatorId);
             this.selectedOperatorId = operatorId;
@@ -879,14 +881,39 @@ $(function() {
             return "#" + (0x1000000 + (Math.round((t - R) * p) + R) * 0x10000 + (Math.round((t - G) * p) + G) * 0x100 + (Math.round((t - B) * p) + B)).toString(16).slice(1);
         },
 
+        // 控制连线及其名称颜色变化的接口
         colorizeLink: function(linkId, color) {
             var linkData = this.data.links[linkId];
             linkData.internal.els.path.setAttribute('stroke', color);
             linkData.internal.els.rect.setAttribute('fill', color);
+            linkData.internal.els.path_text.setAttribute('fill', color);
             linkData.internal.els.fromSmallConnector.css('border-left-color', color);
             linkData.internal.els.toSmallConnector.css('border-left-color', color);
         },
 
+        // 控制连线及其名称粗细变化的接口
+        boldLink: function(linkId, width) {
+        	var linkData = this.data.links[linkId];
+        	linkData.internal.els.path.setAttribute('stroke-width', width);
+        	linkData.internal.els.path_text.style.fontWeight = 'bold'; 
+        },
+
+		// 控制连线及其名称粗细还原的接口
+        unboldLink: function(linkId, width) {
+        	var linkData = this.data.links[linkId];
+        	linkData.internal.els.path.setAttribute('stroke-width', width);
+        	linkData.internal.els.path_text.style.fontWeight = 'normal'; 
+        },
+
+        // 控制 operator 边框粗细和颜色的接口
+        // width_and_color 的赋值形式为 "10px solid #CCCCCC"
+        boldOperator: function(operatorId, width_and_color) {
+        	var tdiv = this.data.operators[operatorId].internal.els.operator[0];
+        	console.log(tdiv.style.border);
+        	tdiv.style.border = width_and_color ;
+        },
+
+        // 控制连线及其名称颜色还原的接口
         uncolorizeLink: function(linkId) {
             this.colorizeLink(linkId, this.getLinkMainColor(linkId));
         },
@@ -909,7 +936,7 @@ $(function() {
                 if (!this.options.onLinkUnselect()) {
                     return;
                 }
-                this.uncolorizeLink(this.selectedLinkId, this.options.defaultSelectedLinkColor);
+                this.unboldLink(this.selectedLinkId, this.options.linkWidth);
                 this.selectedLinkId = null;
             }
         },
@@ -921,7 +948,7 @@ $(function() {
             }
             this.unselectOperator();
             this.selectedLinkId = linkId;
-            this.colorizeLink(linkId, this.options.defaultSelectedLinkColor);
+            this.boldLink(linkId, this.options.linkSelectedWidth);
         },
 
         deleteOperator: function(operatorId) {
@@ -1328,8 +1355,6 @@ $(function() {
             var Output = new Array();
             var Output_count = 0;
             for (var count2 in dataout.links) {
-                //console.log(count2);
-                //console.log(dataout.links);
                 var from = this.getOperatorTitle(dataout.links[count2].toOperator);
                 var to = this.getOperatorTitle(dataout.links[count2].fromOperator);
 
