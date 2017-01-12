@@ -1274,13 +1274,152 @@ $(function() {
             this.record = 0;
         },
 
-        submit: function() {
+         submit: function () {       
             var linkData = [];
-            linkData = $.extend(true, {}, this.data.links);
+            var obj = {};
+            var ii = 0;
+            obj.Edge = new Array();
+            linkData = $.extend(true, {}, this.data.links); 
             this.data.report = this.getReturnValue(linkData);
             for (var i = 0; i < this.data.report.length; i++) {
-                console.log("name: " + this.data.report[i].name + " type: " + this.data.report[i].type + " head: " + this.data.report[i].head + " tail: " + this.data.report[i].tail);
+                var set = {};
+                set.Name = new Array();
+                set.Type = this.data.report[i].type;
+                set.Head = new Array();
+                set.Tail = new Array();
+
+                if (typeof this.data.report[i].name == "object") {
+                    for (var s in this.data.report[i].name) {
+                        set.Name[ii] = this.data.report[i].name[s];
+                        ii++;
+                    }
+                    ii = 0;
+                }
+                else {
+                    set.Name[0] = this.data.report[i].name;
+                }
+
+                if (typeof this.data.report[i].head == "object") {
+                    for (var s in this.data.report[i].head) {
+                        set.Head[ii] = this.data.report[i].head[s];
+                        ii++;
+                    }
+                    ii = 0;
+                }
+                else {
+                    set.Head[0] = this.data.report[i].head;
+                }
+
+                if (typeof this.data.report[i].tail == "object") {
+                    for (var s in this.data.report[i].tail) {
+                        set.Tail[ii] = this.data.report[i].tail[s];
+                        ii++;
+                    }
+                    ii = 0;
+                }
+                else {
+                    set.Tail[0] = this.data.report[i].tail;
+                }
+
+                obj.Edge[i] = set;
+                console.log("name: "+this.data.report[i].name+" type: "+this.data.report[i].type+" head: "+this.data.report[i].head+" tail: "+this.data.report[i].tail);
             }
+
+            var i = 0;
+            var input_count = 0;
+            var output_count = 0;
+            obj.Input = new Array();
+            obj.Output = new Array();
+            obj.DFDID = 1;
+            obj.Node = new Array();
+            var dataout = this.data;
+            for (var count in dataout.operators) {
+                var t = this.getOperatorTitle(count);
+                obj.Node[i] = t;
+                i++
+            }
+
+            var Input = new Array();
+            var Input_count = 0;
+            var Output = new Array();
+            var Output_count = 0;
+            for (var count2 in dataout.links) {
+                //console.log(count2);
+                //console.log(dataout.links);
+                var from = this.getOperatorTitle(dataout.links[count2].toOperator);
+                var to = this.getOperatorTitle(dataout.links[count2].fromOperator);
+
+                if (Input_count != 0) {
+                    Input[Input_count] = to;
+                    Input_count++;
+                }
+                else {
+                    Input[0] = to;
+                    Input_count++;
+                };
+
+
+                if (Output_count != 0) {
+                    Output[Output_count] = from;
+                    Output_count++;
+                }
+                else {
+                    Output[0] = from;
+                    Output_count++;
+                };
+
+            }
+
+            for (var k1 in Input) {
+                var check = 0;
+                if (Input[k1] != "UNDEFINED") {
+                    for (var k2 in Output) {
+                        if (Input[k1] == Output[k2]) {
+                            Output[k2] = "UNDEFINED";
+                            check = 1;
+                        }
+                    }
+                    if (check == 1) {
+                        var a = k1;
+                        var s = Input[k1];
+                        while (a != Input.length) {
+                            if (Input[a] == s) {
+                                Input[a] = "UNDEFINED";
+                            }
+                            a++;
+                        }
+                    }
+                }
+            }
+
+            for (var In in Input) {
+                if (Input[In] != "UNDEFINED") {
+
+                    for (var a in Input) {
+                        if (Input[In] == Input[a] && In != a) {
+                            Input[a] = "UNDEFINED";
+                        }
+                    }
+                    obj.Input[ii] = Input[In];
+                    ii++;
+                }
+            }
+            ii = 0;
+            for (var Out in Output) {
+                if (Output[Out] != "UNDEFINED") {
+
+                    for (var a in Output) {
+                        if (Output[Out] == Output[a] && Out != a) {
+                            Output[a] = "UNDEFINED";
+                        }
+                    }
+                    obj.Output[ii] = Output[Out];
+                    ii++;
+                }
+            }
+
+            console.log(obj);
+            return obj;
         }
 
     });
