@@ -49,9 +49,6 @@ $(function() {
             },
             onOperatorMoved: function(operatorId, position) {
 
-            },
-            onAfterChange: function(changeType) {
-
             }
         },
         data: null,
@@ -261,7 +258,6 @@ $(function() {
             this.data.links[linkId] = linkData;
             this.data.links[linkId].siblings = [];
             this._drawLink(linkId);
-            this.options.onAfterChange('link_create');
         },
 
         redrawLinksLayer: function() {
@@ -726,12 +722,9 @@ $(function() {
                         });
 
                         self.options.onOperatorMoved(operatorId, ui.position);
-                        self.options.onAfterChange('operator_moved');
                     }
                 });
             }
-
-            this.options.onAfterChange('operator_create');
         },
 
         _connectorClicked: function(operator, connector, subConnector, connectorCategory) {
@@ -973,8 +966,6 @@ $(function() {
             }
             this.data.operators[operatorId].internal.els.operator.remove();
             delete this.data.operators[operatorId];
-
-            this.options.onAfterChange('operator_delete');
         },
 
         deleteLink: function(linkId) {
@@ -1018,8 +1009,6 @@ $(function() {
 
             this._cleanMultipleConnectors(fromOperator, fromConnector, 'from');
             this._cleanMultipleConnectors(toOperator, toConnector, 'to');
-
-            this.options.onAfterChange('link_delete');
         },
 
         _cleanMultipleConnectors: function(operator, connector, linkFromTo) {
@@ -1096,7 +1085,6 @@ $(function() {
             }
             this.data.operators[operatorId].properties.title = title;
             this._refreshInternalProperties(this.data.operators[operatorId]);
-            this.options.onAfterChange('operator_title_change');
         },
 
         //MLX: 仿照上一个函数写的setLinkTitle
@@ -1104,7 +1092,6 @@ $(function() {
             this.data.links[linkId].internal.els.text = title;
             this.data.links[linkId].Title = title;
             this._refreshLinkTitle(linkId);
-            this.options.onAfterChange('link_title_change');
         },
 
         getOperatorTitle: function(operatorId) {
@@ -1125,7 +1112,6 @@ $(function() {
             this._deleteOperator(operatorId, true);
             this.createOperator(operatorId, operatorData);
             this.redrawLinksLayer();
-            this.options.onAfterChange('operator_data_change');
         },
 
         doesOperatorExists: function(operatorId) {
@@ -1274,12 +1260,12 @@ $(function() {
             this.record = 0;
         },
 
-         submit: function () {       
+        submit: function() {
             var linkData = [];
             var obj = {};
             var ii = 0;
             obj.Edge = new Array();
-            linkData = $.extend(true, {}, this.data.links); 
+            linkData = $.extend(true, {}, this.data.links);
             this.data.report = this.getReturnValue(linkData);
             for (var i = 0; i < this.data.report.length; i++) {
                 var set = {};
@@ -1294,8 +1280,7 @@ $(function() {
                         ii++;
                     }
                     ii = 0;
-                }
-                else {
+                } else {
                     set.Name[0] = this.data.report[i].name;
                 }
 
@@ -1305,8 +1290,7 @@ $(function() {
                         ii++;
                     }
                     ii = 0;
-                }
-                else {
+                } else {
                     set.Head[0] = this.data.report[i].head;
                 }
 
@@ -1316,13 +1300,12 @@ $(function() {
                         ii++;
                     }
                     ii = 0;
-                }
-                else {
+                } else {
                     set.Tail[0] = this.data.report[i].tail;
                 }
 
                 obj.Edge[i] = set;
-                console.log("name: "+this.data.report[i].name+" type: "+this.data.report[i].type+" head: "+this.data.report[i].head+" tail: "+this.data.report[i].tail);
+                console.log("name: " + this.data.report[i].name + " type: " + this.data.report[i].type + " head: " + this.data.report[i].head + " tail: " + this.data.report[i].tail);
             }
 
             var i = 0;
@@ -1352,8 +1335,7 @@ $(function() {
                 if (Input_count != 0) {
                     Input[Input_count] = to;
                     Input_count++;
-                }
-                else {
+                } else {
                     Input[0] = to;
                     Input_count++;
                 };
@@ -1362,8 +1344,7 @@ $(function() {
                 if (Output_count != 0) {
                     Output[Output_count] = from;
                     Output_count++;
-                }
-                else {
+                } else {
                     Output[0] = from;
                     Output_count++;
                 };

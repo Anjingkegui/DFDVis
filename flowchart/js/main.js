@@ -18,7 +18,7 @@ $(document).ready(function() {
                 top: initTop,
                 left: initLeft,
                 properties: {
-                    title: 'Operator ' + operatorI,
+                    title: 'Node ' + operatorI,
                     inputs: {
                         ins: {
                             label: 'In',
@@ -43,7 +43,7 @@ $(document).ready(function() {
     var $operatorTitle = $('#operator_title');
     var $linkTitle = $('#link_title');
 
-    var $flowchart = $('#flowchartdiv1');
+    var $flowchart = $('#flowchartdiv');
     $flowchart.flowchart({
         data: data,
 
@@ -95,7 +95,7 @@ $(document).ready(function() {
             top: initTop,
             left: initLeft,
             properties: {
-                title: 'Operator ' + operatorI,
+                title: 'Node ' + operatorI,
                 inputs: {
                     ins: {
                         label: 'In',
