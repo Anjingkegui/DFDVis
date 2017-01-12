@@ -43,29 +43,29 @@
             </div>
         </div>
         <!--流图栏-->
-        <div class="row-fluid">
+        <div class="row-fluid" id="main-content-div">
             <div class="span6">
                 <div class="row-fluid" id="btn-row">
                     <div class="btn-group">
-                        <button class="btn" type="button">1#New<em class="icon-align-left"></em></button>
-                        <button class="btn" type="button">2#New<em class="icon-align-right"></em></button>
+                        <button id="btn-new1" class="btn" type="button">1#New<em class="icon-align-left"></em></button>
+                        <button id="btn-new2" class="btn" type="button">2#New<em class="icon-align-right"></em></button>
                     </div>
                     <div class="btn-group">
-                        <button class="btn" type="button" id="btn-oo">OO<em class="icon-align-left"></em></button>
-                        <button class="btn" type="button" id="btn-om">OM<em class="icon-align-center"></em></button>
-                        <button class="btn" type="button" id="btn-mo">MO<em class="icon-align-right"></em></button>
+                        <button id="btn-OO" class="btn" type="button" id="btn-oo">OO<em class="icon-align-left"></em></button>
+                        <button id="btn-OM" class="btn" type="button" id="btn-om">OM<em class="icon-align-center"></em></button>
+                        <button id="btn-MO" class="btn" type="button" id="btn-mo">MO<em class="icon-align-right"></em></button>
                     </div>
                     <div class="btn-group">
-                    <button class="btn" type="button">Del</button>
+                    <button id="btn-delete" class="btn" type="button">Del</button>
                     </div>
                     <div class="btn-group" id="btng-4">
-                    <button class="btn" type="button">Submit</button>
+                    <button id="btn-submit" class="btn" type="button">Submit</button>
                     </div>
                 </div>
                 <div class="accordion" id="dfddiv">
                     <div class="accordion-group">
                         <div class="accordion-heading">
-                            <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#accordion-element-1">1#DFD</a>
+                            <span class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#accordion-element-1">1#DFD</span>
                         </div>
                         <div id="accordion-element-1" class="accordion-body in">
                             <div class="accordion-inner flowchart-example-container" id="flowchartdiv1">
@@ -74,7 +74,7 @@
                     </div>
                     <div class="accordion-group">
                         <div class="accordion-heading">
-                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#accordion-element-2">2#DFD</a>
+                            <span class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#accordion-element-2">2#DFD</span>
                         </div>
                         <div id="accordion-element-2" class="accordion-body in">
                             <div class="accordion-inner flowchart-example-container" id="flowchartdiv2">
@@ -87,7 +87,7 @@
             </div>
         </div>
         <!--对比栏-->
-        <div class="row-fluid">
+        <div class="row-fluid" id="comparison-div">
         </div>
     </div>
 </body>

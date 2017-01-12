@@ -6262,7 +6262,6 @@ a.thumbnail:focus {
 }
 
 .accordion-heading {
-    border-bottom: 0;
 }
 
 .accordion-heading .accordion-toggle {
@@ -6275,7 +6274,6 @@ a.thumbnail:focus {
 }
 
 .accordion-inner {
-    border-top: 2px solid #e5e5e5;
 }
 
 .carousel {

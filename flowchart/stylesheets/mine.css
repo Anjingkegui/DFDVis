@@ -15,4 +15,6 @@
 	margin-right: 5px;
 }
 
-
+#comparison-div {
+	border-top: 2px solid #e5e5e5;
+}
