@@ -487,19 +487,19 @@ $(function() {
             }
 
             if (linkData.mode == 2) {
-                var toX2 = fromX + 100 * Math.sin(Math.PI / 6 * this.calc(linkData.OMNum));
-                var toY2 = fromY - 100 * Math.cos(Math.PI / 6 * this.calc(linkData.OMNum));
+                var toX2 = fromX + 50 * Math.sin(Math.PI / 6 * this.calc(linkData.OMNum));
+                var toY2 = fromY - 50 * Math.cos(Math.PI / 6 * this.calc(linkData.OMNum));
                 linkData.internal.els.path.setAttribute("d", 'M' + bezierFromX + ',' + (fromY) + ' C' + (fromX + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + fromY + ' ' + (toX2 - bezierIntensity) + ',' + toY2 + ' ' + toX2 + ',' + toY2 + 'M' + (toX2) + ',' + (toY2) + 'C' + (toX2 + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + toY2 + ' ' + (toX - bezierIntensity) + ',' + toY + ' ' + bezierToX + ',' + toY);
-                linkData.internal.els.path_text.setAttribute("x", fromX + 100 + (toX - fromX - 100) / 2);
+                linkData.internal.els.path_text.setAttribute("x", fromX + 50 + (toX - fromX - 50) / 2);
                 linkData.internal.els.path_text.setAttribute("y", fromY + (toY - fromY) / 2 - 10);
                 linkData.type = "OM";
             }
 
             if (linkData.mode == 3) {
-                var toX3 = toX - 100 * Math.sin(Math.PI / 6 * this.calc(linkData.MONum));
-                var toY3 = toY - 100 * Math.cos(Math.PI / 6 * this.calc(linkData.MONum));
+                var toX3 = toX - 50 * Math.sin(Math.PI / 6 * this.calc(linkData.MONum));
+                var toY3 = toY - 50 * Math.cos(Math.PI / 6 * this.calc(linkData.MONum));
                 linkData.internal.els.path.setAttribute("d", 'M' + bezierFromX + ',' + (fromY) + ' C' + (fromX + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + fromY + ' ' + (toX3 - bezierIntensity) + ',' + toY3 + ' ' + toX3 + ',' + toY3 + 'M' + (toX3) + ',' + (toY3) + 'C' + (toX3) + ',' + toY3 + ' ' + (toX - bezierIntensity) + ',' + toY + ' ' + bezierToX + ',' + toY);
-                linkData.internal.els.path_text.setAttribute("x", fromX + (toX - 100 - fromX) / 2);
+                linkData.internal.els.path_text.setAttribute("x", fromX + (toX - 50 - fromX) / 2);
                 linkData.internal.els.path_text.setAttribute("y", fromY + (toY - fromY) / 2 - 10);
                 linkData.type = "MO";
             }
