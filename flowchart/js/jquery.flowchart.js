@@ -9,7 +9,7 @@ $(function() {
             data: {},
             distanceFromArrow: 0,
             defaultOperatorClass: 'flowchart-default-operator',
-            defaultLinkTitle: 'link',
+            defaultLinkTitle: '',
             defaultLinkColor: 'black',
             defaultSelectedLinkColor: 'blue',
             linkWidth: 3,
@@ -215,12 +215,13 @@ $(function() {
             if (this.mode != 1) {
                 this.record = 1;
             }
-            this.createLink(this.linkNum, linkData);
+            var linkId = "link " + String(this.linkNum);
+            this.createLink(linkId, linkData);
             if (this.record == 1) {
                 if (typeof this.data.record == "undefined") {
                     this.data.record = [];
                 }
-                this.data.record.push(this.linkNum);
+                this.data.record.push("link " + String(this.linkNum));
             }
             return this.linkNum;
         },
@@ -304,13 +305,6 @@ $(function() {
             return color;
         },
 
-        //改变线的颜色
-        setLinkMainColor: function(linkId, color) {
-            console.log(color);
-            this.data.links[linkId].color = color;
-            this.options.onAfterChange('link_change_main_color');
-        },
-
         getLinkTitle: function(linkId) {
             var title = this.options.defaultLinkTitle;
             var linkData = this.data.links[linkId];
@@ -334,7 +328,6 @@ $(function() {
             var fromConnectorId = linkData.fromConnector;
             var toOperatorId = linkData.toOperator;
             var toConnectorId = linkData.toConnector;
-
 
             if (linkData.mode == 2) {
                 if (typeof this.data.dictionary_3 == "undefined") {
@@ -406,8 +399,8 @@ $(function() {
             linkData.internal.els.rect = shape_rect;
 
             var path_text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            path_text.textContent = this.options.defaultLinkTitle + " " + String(linkId);
-            path_text.setAttribute("id", "link_name" + linkId.toString());
+            path_text.textContent = linkId;
+            path_text.setAttribute("id", linkId);
             path_text.setAttribute("fill", "black");
             group.appendChild(path_text);
             linkData.internal.els.path_text = path_text;
@@ -770,6 +763,7 @@ $(function() {
                 };
 
                 this.addLink(linkData);
+                this.linkNum++;
                 this._unsetTemporaryLink();
             }
         },
@@ -1162,18 +1156,17 @@ $(function() {
         },
 
         _refreshLinkTitle: function(linkId) {
-            var title = jQuery('#' + "link_name" + linkId.toString());
-            title[0].textContent = this.data.links[linkId].internal.els.text;
+            var title = document.getElementById(linkId);
+            title.textContent = this.data.links[linkId].internal.els.text;
         },
-
 
         getReturnValue: function(linkData) {
             var Report = [];
             var i = 0;
             for (i = 0; i <= this.linkNum; i++) {
-                var link = linkData[i];
+                var link = linkData["link " + String(i)];
                 if (typeof link != "undefined" && link.type == "OO") {
-                    var $name = this.getLinkTitle(i);
+                    var $name = this.getLinkTitle("link " + String(i));
                     var $mode = "OO";
                     var fromOperatorId = link.fromOperator;
                     var $head = this.getOperatorTitle(fromOperatorId);
