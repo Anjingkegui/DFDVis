@@ -3198,7 +3198,6 @@ input[type="submit"].btn.btn-mini {
     *margin-right: .3em;
     line-height: 14px;
     vertical-align: text-top;
-    background-image: url("img//glyphicons-halflings.png");
     background-position: 14px 14px;
     background-repeat: no-repeat;
     margin-top: 1px;
@@ -3798,11 +3797,7 @@ input[type="submit"].btn.btn-mini {
     *margin-left: .3em;
 }
 
-.btn-group:first-child {
-    *margin-left: 0;
-}
-
-.btn-group+.btn-group {
+.btn-group {
     margin-left: 5px;
 }
 
@@ -6255,11 +6250,11 @@ a.thumbnail:focus {
 }
 
 .accordion {
-    margin-bottom: 20px;
 }
 
 .accordion-group {
     margin-bottom: 2px;
+    margin-top: 2px;
     border: 2px solid #e5e5e5;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
@@ -7761,8 +7756,6 @@ button.close {
 .col-lg-12 {
     position: relative;
     min-height: 1px;
-    padding-right: 15px;
-    padding-left: 15px;
     float: left;
 }
 

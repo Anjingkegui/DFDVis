@@ -6,7 +6,8 @@ $(document).ready(function() {
     var wHeight = window.innerHeight;
 
     $("#div-systitle").height(80);
-    $("#div-systitle").height(80);
+    $("#div-syshelp").height(80);
+    
 
     //初始化流图输入部分
     var initTop = 300;
@@ -14,7 +15,7 @@ $(document).ready(function() {
     var operatorI = 1;
     var data = {
         operators: {
-            operator1: {
+            o1: {
                 top: initTop,
                 left: initLeft,
                 properties: {
@@ -43,7 +44,7 @@ $(document).ready(function() {
     var $operatorTitle = $('#operator_title');
     var $linkTitle = $('#link_title');
 
-    var $flowchart = $('#flowchartdiv');
+    var $flowchart = $('#flowchartdiv1');
     $flowchart.flowchart({
         data: data,
 
@@ -90,7 +91,7 @@ $(document).ready(function() {
     //siblings() 获得匹配集合中每个元素的同胞，通过选择器进行筛选是可选的
     //这里给button绑定事件和时间处理函数
     $flowchart.siblings('.create_operator').click(function() {
-        var operatorId = 'operator' + operatorI;
+        var operatorId = 'o' + operatorI;
         var operatorData = {
             top: initTop,
             left: initLeft,
