@@ -104,7 +104,7 @@
 
 .flowchart-operator {
     position: absolute;
-    width: 140px;
+    width: 100px;
     border: 1px solid #CCCCCC;
     background: #FAFAFA;
     pointer-events: initial;
@@ -135,8 +135,8 @@
 .flowchart-operator .flowchart-operator-inputs-outputs {
     display: table;
     width: 100%;
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin-top: 1px;
+    margin-bottom: 1px;
 }
 
 .flowchart-operator .flowchart-operator-inputs,
@@ -149,8 +149,6 @@
 
 .flowchart-example-container {
   height: 800px;
-  border: 1px solid #BBB;
-  margin-bottom: 10px;
 }
 
 .flowchart-operator-connector-arrow {
@@ -195,12 +193,6 @@ h4 {
   margin-bottom: 20px;
   border: 4px solid;
   padding: 10px;
-}
-
-#example_9 {
-  width: 2000px;
-  height: 2000px;
-  background: white;
 }
 
 #chart_container {

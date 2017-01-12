@@ -1,4 +1,12 @@
 $(document).ready(function() {
+    //整个页面的初始化部分
+    
+    //获得当前窗口的大小并设置各个view的尺寸
+    var wWidth = window.innerWidth;
+    var wHeight = window.innerHeight;
+
+    $("#div-systitle").height(80);
+    $("#div-systitle").height(80);
 
     //初始化流图输入部分
     var initTop = 300;
@@ -10,16 +18,16 @@ $(document).ready(function() {
                 top: initTop,
                 left: initLeft,
                 properties: {
-                    title: 'Operator ' + operatorI,
+                    title: 'Node' + operatorI,
                     inputs: {
                         ins: {
-                            label: 'Input',
+                            label: 'In',
                             multiple: true
                         }
                     },
                     outputs: {
                         output_1: {
-                            label: 'Output',
+                            label: 'Out',
                             multiple: true
                         }
                     }
@@ -35,7 +43,7 @@ $(document).ready(function() {
     var $operatorTitle = $('#operator_title');
     var $linkTitle = $('#link_title');
 
-    var $flowchart = $('#example_8');
+    var $flowchart = $('#flowchartdiv');
     $flowchart.flowchart({
         data: data,
 
@@ -60,6 +68,7 @@ $(document).ready(function() {
         }
     });
 
+    //默认新增了一个节点
     initTop = initTop + 20;
     initLeft = initLeft + 20;
     operatorI++;
@@ -86,22 +95,23 @@ $(document).ready(function() {
             top: initTop,
             left: initLeft,
             properties: {
-                title: 'Operator ' + operatorI,
+                title: 'Node' + operatorI,
                 inputs: {
                     ins: {
-                        label: 'Input',
+                        label: 'In',
                         multiple: true
                     }
                 },
                 outputs: {
                     output_1: {
-                        label: 'Output',
+                        label: 'Out',
                         multiple: true
                     }
                 }
             }
         };
 
+        //新增了一个节点后改变这些基础计数
         initTop = initTop + 20;
         initLeft = initLeft + 20;
         operatorI++;

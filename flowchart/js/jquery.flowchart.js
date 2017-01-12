@@ -49,15 +49,12 @@ $(function() {
             },
             onOperatorMoved: function(operatorId, position) {
 
-            },
-            onAfterChange: function(changeType) {
-
             }
         },
         data: null,
         objs: null,
         maskNum: 0,
-        linkNum: 0,
+        linkNum: 1,
         operatorNum: 0,
         lastOutputConnectorClicked: null,
         selectedOperatorId: null,
@@ -189,10 +186,6 @@ $(function() {
 
         setData: function(data) {
             this._clearOperatorsLayer();
-            this.data.operatorTypes = {};
-            if (typeof data.operatorTypes != 'undefined') {
-                this.data.operatorTypes = data.operatorTypes;
-            }
 
             this.data.operators = {};
             for (var operatorId in data.operators) {
@@ -213,19 +206,16 @@ $(function() {
         // 设置 linkId 的格式为: “link” + linkNum
         // 如果当前为 OM 或 MO 模式，则更新record并开始记录当前新增的linkId
         addLink: function(linkData) {
-            while (typeof this.data.links[this.linkNum] != 'undefined') {
-                this.linkNum++;
-            }
             if (this.mode != 1) {
                 this.record = 1;
             }
-            var linkId = "link " + String(this.linkNum);
+            var linkId = "l" + String(this.linkNum);
             this.createLink(linkId, linkData);
             if (this.record == 1) {
                 if (typeof this.data.record == "undefined") {
                     this.data.record = [];
                 }
-                this.data.record.push("link " + String(this.linkNum));
+                this.data.record.push("l" + String(this.linkNum));
             }
             return this.linkNum;
         },
@@ -264,9 +254,9 @@ $(function() {
             }
 
             this.data.links[linkId] = linkData;
+            this.data.links[linkId].Title = "link" + this.linkNum;
             this.data.links[linkId].siblings = [];
             this._drawLink(linkId);
-            this.options.onAfterChange('link_create');
         },
 
         redrawLinksLayer: function() {
@@ -358,8 +348,6 @@ $(function() {
             var fromSubConnector = subConnectors[0];
             var toSubConnector = subConnectors[1];
 
-            var title = this.getLinkTitle(linkId);
-
             var fromOperator = this.data.operators[fromOperatorId];
             var toOperator = this.data.operators[toOperatorId];
 
@@ -404,7 +392,7 @@ $(function() {
             linkData.internal.els.rect = shape_rect;
 
             var path_text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            path_text.textContent = linkId;
+            path_text.textContent = this.data.links[linkId].Title;
             path_text.setAttribute("id", linkId);
             path_text.setAttribute("fill", "black");
             group.appendChild(path_text);
@@ -731,12 +719,9 @@ $(function() {
                         });
 
                         self.options.onOperatorMoved(operatorId, ui.position);
-                        self.options.onAfterChange('operator_moved');
                     }
                 });
             }
-
-            this.options.onAfterChange('operator_create');
         },
 
         _connectorClicked: function(operator, connector, subConnector, connectorCategory) {
@@ -978,8 +963,6 @@ $(function() {
             }
             this.data.operators[operatorId].internal.els.operator.remove();
             delete this.data.operators[operatorId];
-
-            this.options.onAfterChange('operator_delete');
         },
 
         deleteLink: function(linkId) {
@@ -1023,8 +1006,6 @@ $(function() {
 
             this._cleanMultipleConnectors(fromOperator, fromConnector, 'from');
             this._cleanMultipleConnectors(toOperator, toConnector, 'to');
-
-            this.options.onAfterChange('link_delete');
         },
 
         _cleanMultipleConnectors: function(operator, connector, linkFromTo) {
@@ -1098,14 +1079,12 @@ $(function() {
             }
             this.data.operators[operatorId].properties.title = title;
             this._refreshInternalProperties(this.data.operators[operatorId]);
-            this.options.onAfterChange('operator_title_change');
         },
 
         setLinkTitle: function(linkId, title) {
             this.data.links[linkId].internal.els.text = title;
             this.data.links[linkId].Title = title;
             this._refreshLinkTitle(linkId);
-            this.options.onAfterChange('link_title_change');
         },
 
         getOperatorTitle: function(operatorId) {
@@ -1126,7 +1105,6 @@ $(function() {
             this._deleteOperator(operatorId, true);
             this.createOperator(operatorId, operatorData);
             this.redrawLinksLayer();
-            this.options.onAfterChange('operator_data_change');
         },
 
         doesOperatorExists: function(operatorId) {
@@ -1140,16 +1118,7 @@ $(function() {
         },
 
         getOperatorFullProperties: function(operatorData) {
-            if (typeof operatorData.type != 'undefined') {
-                var typeProperties = this.data.operatorTypes[operatorData.type];
-                var operatorProperties = {};
-                if (typeof operatorData.properties != 'undefined') {
-                    operatorProperties = operatorData.properties;
-                }
-                return $.extend({}, typeProperties, operatorProperties);
-            } else {
-                return operatorData.properties;
-            }
+            return operatorData.properties;
         },
 
         _refreshInternalProperties: function(operatorData) {
@@ -1163,11 +1132,10 @@ $(function() {
 
         getReturnValue: function(linkData) {
             var Report = [];
-            var i = 0;
-            for (i = 0; i <= this.linkNum; i++) {
-                var link = linkData["link " + String(i)];
+            for (var i = 1; i < this.linkNum; i++) {
+                var link = linkData["l" + String(i)];
                 if (typeof link != "undefined" && link.type == "OO") {
-                    var $name = this.getLinkTitle("link " + String(i));
+                    var $name = this.getLinkTitle("l" + String(i));
                     var $mode = "OO";
                     var fromOperatorId = link.fromOperator;
                     var $head = this.getOperatorTitle(fromOperatorId);
@@ -1276,12 +1244,147 @@ $(function() {
         },
 
         submit: function() {
+            console.log(this.data);
             var linkData = [];
+            var obj = {};
+            var ii = 0;
+            obj.Edge = new Array();
             linkData = $.extend(true, {}, this.data.links);
             this.data.report = this.getReturnValue(linkData);
             for (var i = 0; i < this.data.report.length; i++) {
+                var set = {};
+                set.Name = new Array();
+                set.Type = this.data.report[i].type;
+                set.Head = new Array();
+                set.Tail = new Array();
+
+                if (typeof this.data.report[i].name == "object") {
+                    for (var s in this.data.report[i].name) {
+                        set.Name[ii] = this.data.report[i].name[s];
+                        ii++;
+                    }
+                    ii = 0;
+                } else {
+                    set.Name[0] = this.data.report[i].name;
+                }
+
+                if (typeof this.data.report[i].head == "object") {
+                    for (var s in this.data.report[i].head) {
+                        set.Head[ii] = this.data.report[i].head[s];
+                        ii++;
+                    }
+                    ii = 0;
+                } else {
+                    set.Head[0] = this.data.report[i].head;
+                }
+
+                if (typeof this.data.report[i].tail == "object") {
+                    for (var s in this.data.report[i].tail) {
+                        set.Tail[ii] = this.data.report[i].tail[s];
+                        ii++;
+                    }
+                    ii = 0;
+                } else {
+                    set.Tail[0] = this.data.report[i].tail;
+                }
+
+                obj.Edge[i] = set;
                 console.log("name: " + this.data.report[i].name + " type: " + this.data.report[i].type + " head: " + this.data.report[i].head + " tail: " + this.data.report[i].tail);
             }
+
+            var i = 0;
+            var input_count = 0;
+            var output_count = 0;
+            obj.Input = new Array();
+            obj.Output = new Array();
+            obj.DFDID = 1;
+            obj.Node = new Array();
+            var dataout = this.data;
+            for (var count in dataout.operators) {
+                var t = this.getOperatorTitle(count);
+                obj.Node[i] = t;
+                i++
+            }
+
+            var Input = new Array();
+            var Input_count = 0;
+            var Output = new Array();
+            var Output_count = 0;
+            for (var count2 in dataout.links) {
+                //console.log(count2);
+                //console.log(dataout.links);
+                var from = this.getOperatorTitle(dataout.links[count2].toOperator);
+                var to = this.getOperatorTitle(dataout.links[count2].fromOperator);
+
+                if (Input_count != 0) {
+                    Input[Input_count] = to;
+                    Input_count++;
+                } else {
+                    Input[0] = to;
+                    Input_count++;
+                };
+
+
+                if (Output_count != 0) {
+                    Output[Output_count] = from;
+                    Output_count++;
+                } else {
+                    Output[0] = from;
+                    Output_count++;
+                };
+
+            }
+
+            for (var k1 in Input) {
+                var check = 0;
+                if (Input[k1] != "UNDEFINED") {
+                    for (var k2 in Output) {
+                        if (Input[k1] == Output[k2]) {
+                            Output[k2] = "UNDEFINED";
+                            check = 1;
+                        }
+                    }
+                    if (check == 1) {
+                        var a = k1;
+                        var s = Input[k1];
+                        while (a != Input.length) {
+                            if (Input[a] == s) {
+                                Input[a] = "UNDEFINED";
+                            }
+                            a++;
+                        }
+                    }
+                }
+            }
+
+            for (var In in Input) {
+                if (Input[In] != "UNDEFINED") {
+
+                    for (var a in Input) {
+                        if (Input[In] == Input[a] && In != a) {
+                            Input[a] = "UNDEFINED";
+                        }
+                    }
+                    obj.Input[ii] = Input[In];
+                    ii++;
+                }
+            }
+            ii = 0;
+            for (var Out in Output) {
+                if (Output[Out] != "UNDEFINED") {
+
+                    for (var a in Output) {
+                        if (Output[Out] == Output[a] && Out != a) {
+                            Output[a] = "UNDEFINED";
+                        }
+                    }
+                    obj.Output[ii] = Output[Out];
+                    ii++;
+                }
+            }
+
+            console.log(obj);
+            return obj;
         }
 
     });
