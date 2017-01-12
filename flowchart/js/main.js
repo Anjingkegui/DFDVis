@@ -18,7 +18,7 @@ $(document).ready(function() {
                 top: initTop,
                 left: initLeft,
                 properties: {
-                    title: 'Node ' + operatorI,
+                    title: 'Node' + operatorI,
                     inputs: {
                         ins: {
                             label: 'In',
@@ -95,7 +95,7 @@ $(document).ready(function() {
             top: initTop,
             left: initLeft,
             properties: {
-                title: 'Node ' + operatorI,
+                title: 'Node' + operatorI,
                 inputs: {
                     ins: {
                         label: 'In',

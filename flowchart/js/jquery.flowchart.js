@@ -54,7 +54,7 @@ $(function() {
         data: null,
         objs: null,
         maskNum: 0,
-        linkNum: 0,
+        linkNum: 1,
         operatorNum: 0,
         lastOutputConnectorClicked: null,
         selectedOperatorId: null,
@@ -185,10 +185,6 @@ $(function() {
 
         setData: function(data) {
             this._clearOperatorsLayer();
-            this.data.operatorTypes = {};
-            if (typeof data.operatorTypes != 'undefined') {
-                this.data.operatorTypes = data.operatorTypes;
-            }
 
             this.data.operators = {};
             for (var operatorId in data.operators) {
@@ -206,19 +202,16 @@ $(function() {
         },
 
         addLink: function(linkData) {
-            while (typeof this.data.links[this.linkNum] != 'undefined') {
-                this.linkNum++;
-            }
             if (this.mode != 1) {
                 this.record = 1;
             }
-            var linkId = "link " + String(this.linkNum);
+            var linkId = "l" + String(this.linkNum);
             this.createLink(linkId, linkData);
             if (this.record == 1) {
                 if (typeof this.data.record == "undefined") {
                     this.data.record = [];
                 }
-                this.data.record.push("link " + String(this.linkNum));
+                this.data.record.push("l" + String(this.linkNum));
             }
             return this.linkNum;
         },
@@ -256,6 +249,7 @@ $(function() {
             }
 
             this.data.links[linkId] = linkData;
+            this.data.links[linkId].Title = "link" + this.linkNum;
             this.data.links[linkId].siblings = [];
             this._drawLink(linkId);
         },
@@ -349,8 +343,6 @@ $(function() {
             var fromSubConnector = subConnectors[0];
             var toSubConnector = subConnectors[1];
 
-            var title = this.getLinkTitle(linkId);
-
             var fromOperator = this.data.operators[fromOperatorId];
             var toOperator = this.data.operators[toOperatorId];
 
@@ -395,7 +387,7 @@ $(function() {
             linkData.internal.els.rect = shape_rect;
 
             var path_text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            path_text.textContent = linkId;
+            path_text.textContent = this.data.links[linkId].Title;
             path_text.setAttribute("id", linkId);
             path_text.setAttribute("fill", "black");
             group.appendChild(path_text);
@@ -1125,16 +1117,7 @@ $(function() {
         },
 
         getOperatorFullProperties: function(operatorData) {
-            if (typeof operatorData.type != 'undefined') {
-                var typeProperties = this.data.operatorTypes[operatorData.type];
-                var operatorProperties = {};
-                if (typeof operatorData.properties != 'undefined') {
-                    operatorProperties = operatorData.properties;
-                }
-                return $.extend({}, typeProperties, operatorProperties);
-            } else {
-                return operatorData.properties;
-            }
+            return operatorData.properties;
         },
 
         _refreshInternalProperties: function(operatorData) {
@@ -1148,11 +1131,10 @@ $(function() {
 
         getReturnValue: function(linkData) {
             var Report = [];
-            var i = 0;
-            for (i = 0; i <= this.linkNum; i++) {
-                var link = linkData["link " + String(i)];
+            for (var i = 1; i < this.linkNum; i++) {
+                var link = linkData["l" + String(i)];
                 if (typeof link != "undefined" && link.type == "OO") {
-                    var $name = this.getLinkTitle("link " + String(i));
+                    var $name = this.getLinkTitle("l" + String(i));
                     var $mode = "OO";
                     var fromOperatorId = link.fromOperator;
                     var $head = this.getOperatorTitle(fromOperatorId);
@@ -1261,6 +1243,7 @@ $(function() {
         },
 
         submit: function() {
+            console.log(this.data);
             var linkData = [];
             var obj = {};
             var ii = 0;
