@@ -61,8 +61,23 @@ $(function() {
         selectedLinkId: null,
         positionRatio: 1,
         globalId: null,
-        mode: 1,
-        record: 0,
+        mode: 1,                        // 记录当前连线模式的flag
+
+        record: 0,                      // 记录当前是否需要保存新增边linkID的flag
+
+        recordArray: [],                // 在用户创建OM或MO模式新枝（点击Done按键之前）过程中保存用户创建的新的连线的数组
+
+        dictionary_1: new Array(),		// 字典数据结构，以节点为key，保存以该节点为起始节点的OM连线
+
+        dictionary_2: new Array(),		// 字典数据结构，以节点为key，保存以该节点为终止节点的MO连线
+
+        dictionary_3: new Array(),		// 字典数据结构，以节点为key，保存该节点下OM连线的主干连线的数量，
+        								// 调用linkdone()函数之后递增，用于OM主干连线角度的设定，被_refreshLinkPositions()函数调用
+
+        dictionary_4: new Array(),		// 字典数据结构，以节点为key，保存该节点下MO连线的主干连线的数量
+        								// 调用linkdone()函数之后递增，用于MO主干连线角度的设定，被_refreshLinkPositions()函数调用
+        								
+        report: [],						// 保存每一次的调用getReturnValue()函数的返回值
 
         // the constructor
         _create: function() {
@@ -212,10 +227,7 @@ $(function() {
             var linkId = "l" + String(this.linkNum);
             this.createLink(linkId, linkData);
             if (this.record == 1) {
-                if (typeof this.data.record == "undefined") {
-                    this.data.record = [];
-                }
-                this.data.record.push("l" + String(this.linkNum));
+                this.recordArray.push("l" + String(this.linkNum));
             }
             return this.linkNum;
         },
@@ -325,23 +337,20 @@ $(function() {
             var toConnectorId = linkData.toConnector;
 
             if (linkData.mode == 2) {
-                if (typeof this.data.dictionary_3 == "undefined") {
-                    this.data.dictionary_3 = new Array();
+                if (!!this.dictionary_3[fromOperatorId] == false) {
+                    this.dictionary_3[fromOperatorId] = 1;
                 }
-                if (!!this.data.dictionary_3[fromOperatorId] == false) {
-                    this.data.dictionary_3[fromOperatorId] = 1;
-                }
-                linkData.OMNum = this.data.dictionary_3[fromOperatorId];
+                linkData.OMNum = this.dictionary_3[fromOperatorId];
             }
 
             if (linkData.mode == 3) {
-                if (typeof this.data.dictionary_4 == "undefined") {
-                    this.data.dictionary_4 = new Array();
+                if (typeof this.dictionary_4 == "undefined") {
+                    this.dictionary_4 = new Array();
                 }
-                if (!!this.data.dictionary_4[toOperatorId] == false) {
-                    this.data.dictionary_4[toOperatorId] = 1;
+                if (!!this.dictionary_4[toOperatorId] == false) {
+                    this.dictionary_4[toOperatorId] = 1;
                 }
-                linkData.MONum = this.data.dictionary_4[toOperatorId];
+                linkData.MONum = this.dictionary_4[toOperatorId];
             }
 
             var subConnectors = this._getSubConnectors(linkData);
@@ -436,7 +445,8 @@ $(function() {
             }
         },
 
-        //MLX:SVG划线代码（包括三种模式切换）
+        // SVG划线代码（包括三种模式切换）
+        // 设置 this.data.links[linkId].type
         _refreshLinkPositions: function(linkId) {
             var linkData = this.data.links[linkId];
 
@@ -631,6 +641,7 @@ $(function() {
             return this.operatorNum;
         },
 
+        // 添加一个新的operator，会调用 self._refreshLinkPositions(linkId)
         createOperator: function(operatorId, operatorData) {
             operatorData.internal = {};
             this._refreshInternalProperties(operatorData);
@@ -724,6 +735,8 @@ $(function() {
             }
         },
 
+        // 判断节点连线区域被选中的行为
+        // 调用 addLink() 函数
         _connectorClicked: function(operator, connector, subConnector, connectorCategory) {
             if (connectorCategory == 'outputs') {
                 var d = new Date();
@@ -915,6 +928,10 @@ $(function() {
             this._deleteOperator(operatorId, false);
         },
 
+        // 删除数组中某个特定元素的函数
+        // 被 _deleteLink() 函数调用
+        // 在删除连线的过程中用以修改数组 this.recordArray 
+        // 和数组 this.data.links[linkId].siblings
         deleteSiblings: function(siblings, linkId) {
             var temp = [];
             for (var i = 0; i < siblings.length; i++) {
@@ -933,26 +950,7 @@ $(function() {
                 for (var linkId in this.data.links) {
                     if (this.data.links.hasOwnProperty(linkId)) {
                         var currentLink = this.data.links[linkId];
-                        if (currentLink.fromOperator == operatorId) {
-                            var id = currentLink.toOperator;
-                            if (currentLink.type == "MO" && !!this.data.dictionary_2[id]) {
-                                var siblingArray = this.data.dictionary_2[id];
-                                for (var i = 0; i < siblingArray.length; i++) {
-                                    this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
-                                }
-                                this.data.dictionary_2[id] = this.deleteSiblings(this.data.dictionary_2[id], linkId);
-                            }
-                            this._deleteLink(linkId, true);
-                        }
-                        if (currentLink.toOperator == operatorId) {
-                            var id = currentLink.fromOperator;
-                            if (currentLink.type == "OM" && !!this.data.dictionary_1[id]) {
-                                var siblingArray = this.data.dictionary_1[id];
-                                for (var i = 0; i < siblingArray.length; i++) {
-                                    this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
-                                }
-                                this.data.dictionary_1[id] = this.deleteSiblings(this.data.dictionary_1[id], linkId);
-                            }
+                        if (currentLink.fromOperator == operatorId || currentLink.toOperator == operatorId) {
                             this._deleteLink(linkId, true);
                         }
                     }
@@ -969,6 +967,7 @@ $(function() {
             this._deleteLink(linkId, false);
         },
 
+        // 被 _deleteOperator 调用
         _deleteLink: function(linkId, forced) {
             if (this.selectedLinkId == linkId) {
                 this.unselectLink();
@@ -986,19 +985,33 @@ $(function() {
             var toOperator = linkData.toOperator;
             var toConnector = linkData.toConnector;
 
-
-            if (linkData.type == "OM" && !!this.data.dictionary_1[fromOperator]) {
-                var siblingArray = this.data.dictionary_1[fromOperator];
-                for (var i = 0; i < siblingArray.length; i++) {
-                    this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
-                    this.data.dictionary_1[fromOperator] = this.deleteSiblings(this.data.dictionary_1[fromOperator], linkId);
-                }
-            } else if (linkData.type == "MO" && !!this.data.dictionary_2[toOperator]) {
-                var siblingArray = this.data.dictionary_2[toOperator];
-                for (var i = 0; i < siblingArray.length; i++) {
-                    this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
-                    this.data.dictionary_2[toOperator] = this.deleteSiblings(this.data.dictionary_2[toOperator], linkId);
-                }
+            // 首先判断被删除连线的类型 （OM 或 MO）
+            // 如果当前并未点击 Done 按键，即尚未保存当前新构建的 OM 新枝
+            // 则从数组 this.recordArray 中删除当前连线的 Id
+            // 否则则根据 ditionary_1 中记录的 siblings 
+            // 对被删除边的所有兄弟边的 siblings 属性数组进行更新
+            if (linkData.type == "OM") {
+            	if (this.record == 1) {
+            		this.recordArray = this.deleteSiblings(this.recordArray, linkId);
+            	}
+            	else if (!!this.dictionary_1[fromOperator]) {
+	                var siblingArray = this.dictionary_1[fromOperator];
+	                for (var i = 0; i < siblingArray.length; i++) {
+	                    this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
+	                    this.dictionary_1[fromOperator] = this.deleteSiblings(this.dictionary_1[fromOperator], linkId);
+	                }
+            	}
+            } else if (linkData.type == "MO") {
+            	if (this.record == 1) {
+            		this.recordArray = this.deleteSiblings(this.recordArray, linkId);
+            	}
+            	else if (!!this.dictionary_2[toOperator]) {
+	                var siblingArray = this.dictionary_2[toOperator];
+	                for (var i = 0; i < siblingArray.length; i++) {
+	                    this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
+	                    this.dictionary_2[toOperator] = this.deleteSiblings(this.dictionary_2[toOperator], linkId);
+	                }
+	            }
             }
 
             linkData.internal.els.overallGroup.remove();
@@ -1081,6 +1094,8 @@ $(function() {
             this._refreshInternalProperties(this.data.operators[operatorId]);
         },
 
+        // 设置连线名称为 title
+        // 同时更新连线名称框中的文字和连线自身 Title 属性的值
         setLinkTitle: function(linkId, title) {
             this.data.links[linkId].internal.els.text = title;
             this.data.links[linkId].Title = title;
@@ -1130,6 +1145,8 @@ $(function() {
             title.textContent = this.data.links[linkId].internal.els.text;
         },
 
+        // 封装所有连线的信息
+        // 被 submit() 函数调用
         getReturnValue: function(linkData) {
             var Report = [];
             for (var i = 1; i < this.linkNum; i++) {
@@ -1191,58 +1208,58 @@ $(function() {
             }
         },
 
+        // 用户点击 Done 按键之后的操作
+        // 更新 dictionary_1 或 dictionary_2 的内容
+        // 为 dictionary_3 或 dictionary_4 的对应节点递增计数
         linkdone: function() {
-            if (this.mode == 2 && this.data.record.length > 0) {
-                if (typeof this.data.dictionary_1 == "undefined") {
-                    this.data.dictionary_1 = new Array();
-                }
-                if (typeof this.data.dictionary_3 == "undefined") {
-                    this.data.dictionary_3 = new Array();
-                }
-                var fromOperatorId = this.data.links[this.data.record[0]].fromOperator;
-                if (!!this.data.dictionary_1[fromOperatorId]) {
-                    var id = this.data.dictionary_1[fromOperatorId];
-                    for (var i = 0; i < this.data.record.length; i++) {
-                        id.push(this.data.record[i]);
+            if (this.mode == 2 && this.recordArray.length > 0) {
+                var fromOperatorId = this.data.links[this.recordArray[0]].fromOperator;
+                if (!!this.dictionary_1[fromOperatorId]) {
+                    var id = this.dictionary_1[fromOperatorId];
+                    for (var i = 0; i < this.recordArray.length; i++) {
+                        id.push(this.recordArray[i]);
                     }
-                    this.data.dictionary_1[fromOperatorId] = id;
+                    this.dictionary_1[fromOperatorId] = id;
                 } else {
-                    this.data.dictionary_1[fromOperatorId] = this.data.record;
+                    this.dictionary_1[fromOperatorId] = this.recordArray;
                 }
-                this.addSiblings(this.data.record);
+                this.addSiblings(this.recordArray);
 
-                if (!!this.data.dictionary_3[fromOperatorId]) {
-                    this.data.dictionary_3[fromOperatorId]++;
+                if (!!this.dictionary_3[fromOperatorId]) {
+                    this.dictionary_3[fromOperatorId]++;
                 }
             }
 
-            if (this.mode == 3 && this.data.record.length > 0) {
-                if (typeof this.data.dictionary_2 == "undefined") {
-                    this.data.dictionary_2 = new Array();
+            if (this.mode == 3 && this.recordArray.length > 0) {
+                if (typeof this.dictionary_2 == "undefined") {
+                    this.dictionary_2 = new Array();
                 }
-                if (typeof this.data.dictionary_4 == "undefined") {
-                    this.data.dictionary_4 = new Array();
+                if (typeof this.dictionary_4 == "undefined") {
+                    this.dictionary_4 = new Array();
                 }
-                var toOperatorId = this.data.links[this.data.record[0]].toOperator;
-                if (!!this.data.dictionary_2[toOperatorId]) {
-                    var id = this.data.dictionary_2[toOperatorId];
-                    for (var i = 0; i < this.data.record.length; i++) {
-                        id.push(this.data.record[i]);
+                var toOperatorId = this.data.links[this.recordArray[0]].toOperator;
+                if (!!this.dictionary_2[toOperatorId]) {
+                    var id = this.dictionary_2[toOperatorId];
+                    for (var i = 0; i < this.recordArray.length; i++) {
+                        id.push(this.recordArray[i]);
                     }
-                    this.data.dictionary_2[toOperatorId] = id;
+                    this.dictionary_2[toOperatorId] = id;
                 } else {
-                    this.data.dictionary_2[toOperatorId] = this.data.record;
+                    this.dictionary_2[toOperatorId] = this.recordArray;
                 }
-                this.addSiblings(this.data.record);
-                if (!!this.data.dictionary_4[toOperatorId]) {
-                    this.data.dictionary_4[toOperatorId]++;
+                this.addSiblings(this.recordArray);
+                if (!!this.dictionary_4[toOperatorId]) {
+                    this.dictionary_4[toOperatorId]++;
                 }
             }
 
-            this.data.record = [];
+            this.recordArray = [];
             this.record = 0;
         },
 
+        // 用户点击 Submit 按键之后的操作
+        // 调用 this.getReturnValue() 
+        // 生成描述流图的对象，发送至服务器 
         submit: function() {
             console.log(this.data);
             var linkData = [];
@@ -1250,46 +1267,46 @@ $(function() {
             var ii = 0;
             obj.Edge = new Array();
             linkData = $.extend(true, {}, this.data.links);
-            this.data.report = this.getReturnValue(linkData);
-            for (var i = 0; i < this.data.report.length; i++) {
+            this.report = this.getReturnValue(linkData);
+            for (var i = 0; i < this.report.length; i++) {
                 var set = {};
                 set.Name = new Array();
-                set.Type = this.data.report[i].type;
+                set.Type = this.report[i].type;
                 set.Head = new Array();
                 set.Tail = new Array();
 
-                if (typeof this.data.report[i].name == "object") {
-                    for (var s in this.data.report[i].name) {
-                        set.Name[ii] = this.data.report[i].name[s];
+                if (typeof this.report[i].name == "object") {
+                    for (var s in this.report[i].name) {
+                        set.Name[ii] = this.report[i].name[s];
                         ii++;
                     }
                     ii = 0;
                 } else {
-                    set.Name[0] = this.data.report[i].name;
+                    set.Name[0] = this.report[i].name;
                 }
 
-                if (typeof this.data.report[i].head == "object") {
-                    for (var s in this.data.report[i].head) {
-                        set.Head[ii] = this.data.report[i].head[s];
+                if (typeof this.report[i].head == "object") {
+                    for (var s in this.report[i].head) {
+                        set.Head[ii] = this.report[i].head[s];
                         ii++;
                     }
                     ii = 0;
                 } else {
-                    set.Head[0] = this.data.report[i].head;
+                    set.Head[0] = this.report[i].head;
                 }
 
-                if (typeof this.data.report[i].tail == "object") {
-                    for (var s in this.data.report[i].tail) {
-                        set.Tail[ii] = this.data.report[i].tail[s];
+                if (typeof this.report[i].tail == "object") {
+                    for (var s in this.report[i].tail) {
+                        set.Tail[ii] = this.report[i].tail[s];
                         ii++;
                     }
                     ii = 0;
                 } else {
-                    set.Tail[0] = this.data.report[i].tail;
+                    set.Tail[0] = this.report[i].tail;
                 }
 
                 obj.Edge[i] = set;
-                console.log("name: " + this.data.report[i].name + " type: " + this.data.report[i].type + " head: " + this.data.report[i].head + " tail: " + this.data.report[i].tail);
+                console.log("name: " + this.report[i].name + " type: " + this.report[i].type + " head: " + this.report[i].head + " tail: " + this.report[i].tail);
             }
 
             var i = 0;
