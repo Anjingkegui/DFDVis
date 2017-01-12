@@ -6260,7 +6260,7 @@ a.thumbnail:focus {
 
 .accordion-group {
     margin-bottom: 2px;
-    border: 1px solid #e5e5e5;
+    border: 2px solid #e5e5e5;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -6280,8 +6280,7 @@ a.thumbnail:focus {
 }
 
 .accordion-inner {
-    padding: 9px 15px;
-    border-top: 1px solid #e5e5e5;
+    border-top: 2px solid #e5e5e5;
 }
 
 .carousel {

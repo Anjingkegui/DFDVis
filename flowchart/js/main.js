@@ -1,4 +1,12 @@
 $(document).ready(function() {
+    //整个页面的初始化部分
+    
+    //获得当前窗口的大小并设置各个view的尺寸
+    var wWidth = window.innerWidth;
+    var wHeight = window.innerHeight;
+
+    $("#div-systitle").height(80);
+    $("#div-systitle").height(80);
 
     //初始化流图输入部分
     var initTop = 300;
@@ -13,13 +21,13 @@ $(document).ready(function() {
                     title: 'Operator ' + operatorI,
                     inputs: {
                         ins: {
-                            label: 'Input',
+                            label: 'In',
                             multiple: true
                         }
                     },
                     outputs: {
                         output_1: {
-                            label: 'Output',
+                            label: 'Out',
                             multiple: true
                         }
                     }
@@ -35,7 +43,7 @@ $(document).ready(function() {
     var $operatorTitle = $('#operator_title');
     var $linkTitle = $('#link_title');
 
-    var $flowchart = $('#flowchartdiv');
+    var $flowchart = $('#flowchartdiv1');
     $flowchart.flowchart({
         data: data,
 
@@ -90,13 +98,13 @@ $(document).ready(function() {
                 title: 'Operator ' + operatorI,
                 inputs: {
                     ins: {
-                        label: 'Input',
+                        label: 'In',
                         multiple: true
                     }
                 },
                 outputs: {
                     output_1: {
-                        label: 'Output',
+                        label: 'Out',
                         multiple: true
                     }
                 }
