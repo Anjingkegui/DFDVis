@@ -126,6 +126,7 @@ $(function() {
             };
         },
 
+        // 初始化状态
         _initEvents: function() {
 
             var self = this;
@@ -208,6 +209,9 @@ $(function() {
             this.redrawLinksLayer();
         },
 
+        // 添加 link，只在 connectors clicked 的时候被调用
+        // 设置 linkId 的格式为: “link” + linkNum
+        // 如果当前为 OM 或 MO 模式，则更新record并开始记录当前新增的linkId
         addLink: function(linkData) {
             while (typeof this.data.links[this.linkNum] != 'undefined') {
                 this.linkNum++;
@@ -226,6 +230,7 @@ $(function() {
             return this.linkNum;
         },
 
+        // 在 setData 函数中被调用
         createLink: function(linkId, linkDataOriginal) {
             var linkData = $.extend(true, {}, linkDataOriginal);
             if (!this.options.onLinkCreate(linkId, linkData)) {
@@ -1086,9 +1091,6 @@ $(function() {
             this.record = 1;
         },
 
-
-
-        //MLX: 设置operator名称的函数 (从这里到结尾部分都是)
         setOperatorTitle: function(operatorId, title) {
             this.data.operators[operatorId].internal.els.title.html(title);
             if (typeof this.data.operators[operatorId].properties == 'undefined') {
@@ -1099,7 +1101,6 @@ $(function() {
             this.options.onAfterChange('operator_title_change');
         },
 
-        //MLX: 仿照上一个函数写的setLinkTitle
         setLinkTitle: function(linkId, title) {
             this.data.links[linkId].internal.els.text = title;
             this.data.links[linkId].Title = title;
