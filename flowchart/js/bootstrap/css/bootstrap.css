@@ -5330,7 +5330,7 @@ a.thumbnail:focus {
 
 .alert {
     padding: 8px 35px 8px 14px;
-    margin-bottom: 20px;
+    margin: 5px;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
     background-color: #fcf8e3;
     border: 1px solid #fbeed5;
@@ -5356,9 +5356,9 @@ a.thumbnail:focus {
 }
 
 .alert-success {
-    background-color: #dff0d8;
-    border-color: #d6e9c6;
-    color: #468847;
+    background-color: #e5e5e5;
+    border-color: #e5e5e5;
+    color: black;
 }
 
 .alert-success h4 {

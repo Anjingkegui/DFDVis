@@ -185,11 +185,11 @@ h4 {
 
 #operator_properties, 
 #link_properties {
+  position:absolute;
   display: none;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  border: 4px solid;
-  padding: 10px;
+  left: 25px;
+  bottom: 185px;
+  padding: 5px;
 }
 
 #chart_container {

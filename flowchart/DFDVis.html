@@ -25,7 +25,8 @@
             <div class="span10" id="div-systitle">
                 <h2>DFDVis    <small>A system for DFD.</small></h2>
             </div>
-            <div class="span2" id="div-syshelp">
+            <div class="span2" id="div-sys
+help">
                 <a id="modal" href="#modal-container" role="button" class="btn" data-toggle="modal">关于</a>
                 <div id="modal-container" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                     <div class="modal-header">
@@ -56,10 +57,10 @@
                         <button id="btn-MO" class="btn" type="button" id="btn-mo">MO<em class="icon-align-right"></em></button>
                     </div>
                     <div class="btn-group">
-                    <button id="btn-delete" class="btn" type="button">Del</button>
+                        <button id="btn-delete" class="btn" type="button">Del</button>
                     </div>
                     <div class="btn-group" id="btng-4">
-                    <button id="btn-submit" class="btn" type="button">Submit</button>
+                        <button id="btn-submit" class="btn" type="button">Submit</button>
                     </div>
                 </div>
                 <div class="accordion" id="dfddiv">
@@ -88,6 +89,14 @@
         </div>
         <!--对比栏-->
         <div class="row-fluid" id="comparison-div">
+        </div>
+        <div id="operator_properties" class="alert alert-success alert-dismissable">
+            <label for="operator_title">Operator's title: </label>
+            <input type="text" id="operator_title" />
+        </div>
+        <div id="link_properties" class="alert alert-success alert-dismissable">
+            <label for="link_title">Link's title: </label>
+            <input type="text" id="link_title" />
         </div>
     </div>
 </body>
