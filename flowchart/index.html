@@ -15,6 +15,8 @@
     <script src="js/jquery-mousewheel/jquery.mousewheel.min.js"></script>
     <!--******************************-->
     <script src="js/jquery.flowchart.js"></script>
+    <script src="js/initflowchart.js"></script>
+    <!--init begin-->
     <script src="js/main.js"></script>
 </head>
 
@@ -89,13 +91,18 @@
         <!--对比栏-->
         <div class="row-fluid" id="comparison-div">
         </div>
-        <div id="operator_properties" class="alert alert-success alert-dismissable">
+        <div id="operator_properties" class="alert alert-success">
             <label for="operator_title">Operator's title: </label>
             <input type="text" id="operator_title" />
         </div>
-        <div id="link_properties" class="alert alert-success alert-dismissable">
+        <div id="link_properties" class="alert alert-success">
             <label for="link_title">Link's title: </label>
             <input type="text" id="link_title" />
+        </div>
+        <div id="errortip" class="alert alert-danger">
+            <button type="button" id="tipclose">×</button>
+            <h3>Attention!</h3>
+            <p id="tipcontent">Here is some tips.</p>
         </div>
     </div>
 </body>
