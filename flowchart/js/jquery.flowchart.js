@@ -238,7 +238,7 @@ $(function() {
             var linkId = "l" + String(this.linkNum);
             this.createLink(linkId, linkData);
             if (this.record == 1) {
-                this.recordArray.push("l" + String(this.linkNum));
+                this.recordArray.push(linkId);
             }
             return this.linkNum;
         },
@@ -355,9 +355,6 @@ $(function() {
             }
 
             if (linkData.mode == 3) {
-                if (typeof this.dictionary_4 == "undefined") {
-                    this.dictionary_4 = new Array();
-                }
                 if (!!this.dictionary_4[toOperatorId] == false) {
                     this.dictionary_4[toOperatorId] = 1;
                 }
@@ -499,8 +496,8 @@ $(function() {
                 var toX2 = fromX + 50 * Math.sin(Math.PI / 6 * this.calc(linkData.OMNum));
                 var toY2 = fromY - 50 * Math.cos(Math.PI / 6 * this.calc(linkData.OMNum));
                 linkData.internal.els.path.setAttribute("d", 'M' + bezierFromX + ',' + (fromY) + ' C' + (fromX + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + fromY + ' ' + (toX2 - bezierIntensity) + ',' + toY2 + ' ' + toX2 + ',' + toY2 + 'M' + (toX2) + ',' + (toY2) + 'C' + (toX2 + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + toY2 + ' ' + (toX - bezierIntensity) + ',' + toY + ' ' + bezierToX + ',' + toY);
-                linkData.internal.els.path_text.setAttribute("x", fromX + 50 + (toX - fromX - 50) / 2);
-                linkData.internal.els.path_text.setAttribute("y", fromY + (toY - fromY) / 2 - 10);
+                linkData.internal.els.path_text.setAttribute("x", toX2 + 50 + (toX - toX2 - 50) / 2);
+                linkData.internal.els.path_text.setAttribute("y", toY2 + (toY - toY2) / 2 - 10);
                 linkData.type = "OM";
             }
 
@@ -1036,31 +1033,29 @@ $(function() {
             var toOperator = linkData.toOperator;
             var toConnector = linkData.toConnector;
 
-            // 首先判断被删除连线的类型 （OM 或 MO）
-            // 如果当前并未点击 Done 按键，即尚未保存当前新构建的 OM 新枝
-            // 则从数组 this.recordArray 中删除当前连线的 Id
-            // 否则则根据 ditionary_1 中记录的 siblings 
+            //  OO 类型直接删掉即可
+            //  OM 或 MO 类型则要dictionary 和 siblings
+
+            // 首先判断被删除连线的类型
+            // 然后根据 dictionary 中记录的 siblings 
             // 对被删除边的所有兄弟边的 siblings 属性数组进行更新
             if (linkData.type == "OM") {
-                if (this.record == 1) {
-                    this.recordArray = this.deleteSiblings(this.recordArray, linkId);
-                } else if (!!this.dictionary_1[fromOperator]) {
-                    var siblingArray = this.dictionary_1[fromOperator];
-                    for (var i = 0; i < siblingArray.length; i++) {
-                        this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
-                        this.dictionary_1[fromOperator] = this.deleteSiblings(this.dictionary_1[fromOperator], linkId);
-                    }
+                var siblingArray = this.dictionary_1[fromOperator];
+                for (var i = 0; i < siblingArray.length; i++) {
+                    this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
+                    this.dictionary_1[fromOperator] = this.deleteSiblings(this.dictionary_1[fromOperator], linkId);
                 }
+                if (this.data.links[linkId].siblings.length == 0)
+                    this.dictionary_3[fromOperator] -= 1;
+                console.log(this.dictionary_3[fromOperator]);
             } else if (linkData.type == "MO") {
-                if (this.record == 1) {
-                    this.recordArray = this.deleteSiblings(this.recordArray, linkId);
-                } else if (!!this.dictionary_2[toOperator]) {
-                    var siblingArray = this.dictionary_2[toOperator];
-                    for (var i = 0; i < siblingArray.length; i++) {
-                        this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
-                        this.dictionary_2[toOperator] = this.deleteSiblings(this.dictionary_2[toOperator], linkId);
-                    }
+                var siblingArray = this.dictionary_2[toOperator];
+                for (var i = 0; i < siblingArray.length; i++) {
+                    this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
+                    this.dictionary_2[toOperator] = this.deleteSiblings(this.dictionary_2[toOperator], linkId);
                 }
+                if (this.data.links[linkId].siblings.length == 0)
+                    this.dictionary_4[toOperator] -= 1;
             }
 
             linkData.internal.els.overallGroup.remove();
@@ -1104,6 +1099,7 @@ $(function() {
         },
 
         deleteSelected: function() {
+            this.linkdone();
             if (this.selectedLinkId != null) {
                 this.deleteLink(this.selectedLinkId);
             }
@@ -1267,35 +1263,24 @@ $(function() {
             if (this.mode == 2 && this.recordArray.length > 0) {
                 var fromOperatorId = this.data.links[this.recordArray[0]].fromOperator;
                 if (!!this.dictionary_1[fromOperatorId]) {
-                    var id = this.dictionary_1[fromOperatorId];
                     for (var i = 0; i < this.recordArray.length; i++) {
-                        id.push(this.recordArray[i]);
+                        this.dictionary_1[fromOperatorId].push(this.recordArray[i]);
                     }
-                    this.dictionary_1[fromOperatorId] = id;
                 } else {
                     this.dictionary_1[fromOperatorId] = this.recordArray;
                 }
                 this.addSiblings(this.recordArray);
-
                 if (!!this.dictionary_3[fromOperatorId]) {
                     this.dictionary_3[fromOperatorId]++;
                 }
             }
 
             if (this.mode == 3 && this.recordArray.length > 0) {
-                if (typeof this.dictionary_2 == "undefined") {
-                    this.dictionary_2 = new Array();
-                }
-                if (typeof this.dictionary_4 == "undefined") {
-                    this.dictionary_4 = new Array();
-                }
                 var toOperatorId = this.data.links[this.recordArray[0]].toOperator;
                 if (!!this.dictionary_2[toOperatorId]) {
-                    var id = this.dictionary_2[toOperatorId];
                     for (var i = 0; i < this.recordArray.length; i++) {
-                        id.push(this.recordArray[i]);
+                        this.dictionary_2[toOperatorId].push(this.recordArray[i]);
                     }
-                    this.dictionary_2[toOperatorId] = id;
                 } else {
                     this.dictionary_2[toOperatorId] = this.recordArray;
                 }
@@ -1313,6 +1298,10 @@ $(function() {
         // 调用 this.getReturnValue() 
         // 生成描述流图的对象，发送至服务器 
         submit: function() {
+            //如果没有点击linkdone就submit
+            if (this.recordArray.length > 0)
+                this.linkdone();
+
             this.options.interFace.showTips("test");
             console.log(this.data);
             var linkData = [];
