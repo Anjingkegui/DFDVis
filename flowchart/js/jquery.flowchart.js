@@ -1193,20 +1193,25 @@ $(function() {
         getReturnValue: function(linkData) {
             //linkData即this.data.links
             var Report = [];
-            for (var link in linkData) {
+            for (var i in linkData) {
+                var link = linkData[i];
+
+                var $name = [];
+                var $mode = "";
+                var $head = [];
+                var $tail = [];
+
                 if (typeof link != "undefined" && link.type == "OO") {
-                    var $name = this.getLinkTitle("l" + String(i));
-                    var $mode = "OO";
+                    $name.push(this.getLinkTitle(String(i)));
+                    $mode = "OO";
                     var fromOperatorId = link.fromOperator;
-                    var $head = this.getOperatorTitle(fromOperatorId);
+                    $head.push(this.getOperatorTitle(fromOperatorId));
                     var toOperatorId = link.toOperator;
-                    var $tail = this.getOperatorTitle(toOperatorId);
+                    $tail.push(this.getOperatorTitle(toOperatorId));
                 } else if (typeof link != "undefined" && link.type == "OM") {
-                    var $name = [];
-                    var $mode = "OM";
+                    $mode = "OM";
                     var fromOperatorId = link.fromOperator;
-                    var $head = this.getOperatorTitle(fromOperatorId);
-                    var $tail = [];
+                    $head.push(this.getOperatorTitle(fromOperatorId));
                     for (var j = 0; j < link.siblings.length; j++) {
                         $name.push(this.getLinkTitle(link.siblings[j]));
                         var toOperatorId = linkData[link.siblings[j]].toOperator;
@@ -1216,11 +1221,9 @@ $(function() {
                         delete linkData[link.siblings[j]];
                     }
                 } else if (typeof link != "undefined" && link.type == "MO") {
-                    var $name = [];
-                    var $mode = "MO";
+                    $mode = "MO";
                     var toOperatorId = link.toOperator;
-                    var $head = [];
-                    var $tail = this.getOperatorTitle(toOperatorId);
+                    $tail.push(this.getOperatorTitle(toOperatorId));
                     for (var j = 0; j < link.siblings.length; j++) {
                         $name.push(this.getLinkTitle(link.siblings[j]));
                         var fromOperatorId = linkData[link.siblings[j]].fromOperator;
@@ -1311,6 +1314,8 @@ $(function() {
             obj.Edge = new Array();
             linkData = $.extend(true, {}, this.data.links);
             this.report = this.getReturnValue(linkData);
+            console.log(this.report);
+
             for (var i = 0; i < this.report.length; i++) {
                 var set = {};
                 set.Name = new Array();

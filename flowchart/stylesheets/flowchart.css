@@ -30,8 +30,8 @@
 
 .flowchart-operator-connector {
     position: relative;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding-top: 1px;
+    padding-bottom: 1px;
 }
 
 .flowchart-operator-connector-label {
@@ -105,7 +105,7 @@
 
 .flowchart-operator {
     position: absolute;
-    width: 100px;
+    
     border: 1px solid #CCCCCC;
     background: #FAFAFA;
     pointer-events: initial;
@@ -146,6 +146,15 @@
     width: 50%;
 }
 
+.flowchart-operator-inputs {
+  border-right: 1px solid #DDDDDD;
+}
+.flowchart-operator-outputs {
+  border-left: 1px solid #DDDDDD;
+}
+.flowchart-operator-connector-label {
+  min-width: 20px;
+}
 /*******************************************************/
 
 .flowchart-operator-connector-arrow {
@@ -188,7 +197,7 @@ h4 {
   position:absolute;
   display: none;
   left: 25px;
-  bottom: 185px;
+  bottom: 155px;
   padding: 5px;
 }
 

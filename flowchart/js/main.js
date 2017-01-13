@@ -61,7 +61,7 @@ $(document).ready(function() {
                 top: initTop1,
                 left: initLeft1,
                 properties: {
-                    title: 'Node' + operatorI,
+                    title: 'node' + operatorI,
                     inputs: {
                         inp: {
                             label: 'In',
@@ -133,7 +133,7 @@ $(document).ready(function() {
                 top: initTop2,
                 left: initLeft2,
                 properties: {
-                    title: 'Node' + operatorI,
+                    title: 'node' + operatorI,
                     inputs: {
                         inp: {
                             label: 'In',
@@ -207,7 +207,7 @@ $(document).ready(function() {
             top: initTop1,
             left: initLeft1,
             properties: {
-                title: 'Node' + operatorI,
+                title: 'node' + operatorI,
                 inputs: {
                     inp: {
                         label: 'In',
@@ -238,7 +238,7 @@ $(document).ready(function() {
             top: initTop2,
             left: initLeft2,
             properties: {
-                title: 'Node' + operatorI,
+                title: 'node' + operatorI,
                 inputs: {
                     inp: {
                         label: 'In',
