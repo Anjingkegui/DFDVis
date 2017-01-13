@@ -84,20 +84,24 @@ $(document).ready(function() {
         data: data,
         //这四个函数在这里设置是要保持对operator_properties、link_properties等元素的操作
         onOperatorSelect: function(operatorId) {
+            $("#btn-delete").removeAttr("disabled");
             $operatorProperties.show();
             $operatorTitle.val($dfd1.flowchart('getOperatorTitle', operatorId));
             return true;
         },
         onOperatorUnselect: function() {
+            $("#btn-delete").attr('disabled',"true");
             $operatorProperties.hide();
             return true;
         },
         onLinkSelect: function(linkId) {
+            $("#btn-delete").removeAttr("disabled");
             $linkProperties.show();
             $linkTitle.val($dfd1.flowchart('getLinkTitle', linkId));
             return true;
         },
         onLinkUnselect: function() {
+            $("#btn-delete").attr('disabled',"true");
             $linkProperties.hide();
             return true;
         }
@@ -152,20 +156,24 @@ $(document).ready(function() {
         data: data,
         //这四个函数在这里设置是要保持对operator_properties、link_properties等元素的操作
         onOperatorSelect: function(operatorId) {
+            $("#btn-delete").removeAttr("disabled");
             $operatorProperties.show();
             $operatorTitle.val($dfd2.flowchart('getOperatorTitle', operatorId));
             return true;
         },
         onOperatorUnselect: function() {
+            $("#btn-delete").attr('disabled',"true");
             $operatorProperties.hide();
             return true;
         },
         onLinkSelect: function(linkId) {
+            $("#btn-delete").removeAttr("disabled");
             $linkProperties.show();
             $linkTitle.val($dfd2.flowchart('getLinkTitle', linkId));
             return true;
         },
         onLinkUnselect: function() {
+            $("#btn-delete").attr('disabled',"true");
             $linkProperties.hide();
             return true;
         }
@@ -255,6 +263,7 @@ $(document).ready(function() {
     });
 
     //btn-delete
+    $("#btn-delete").attr('disabled',"true");
     $("#btn-delete").click(function() {
         $dfd1.flowchart('deleteSelected');
         $dfd2.flowchart('deleteSelected');
