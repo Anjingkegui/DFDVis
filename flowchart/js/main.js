@@ -5,10 +5,10 @@ $(document).ready(function() {
     var wWidth = window.innerWidth;
     var wHeight = window.innerHeight;
 
-    $("#div-systitle").height(80);
-    $("#div-syshelp").height(80);
-    $("#comparison-div").height(180);
-    var mainContentDivHeight = wHeight - 80 - 180 - 2 - 2;
+    $("#div-systitle").height(70);
+    $("#div-syshelp").height($("#div-systitle").height());
+    $("#comparison-div").height(150);
+    var mainContentDivHeight = wHeight - $("#div-systitle").height() - $("#comparison-div").height() - 2 - 2;
     $("#main-content-div").height(mainContentDivHeight);
 
     var heightForTwoDfddraw = mainContentDivHeight - 34 - 36 - 36 - 12;
