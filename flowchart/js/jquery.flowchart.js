@@ -21,11 +21,22 @@ $(function() {
             multipleLinksOnOutput: true,
             multipleLinksOnInput: true,
             linkVerticalDecal: 0,
-            onOperatorSelect: function(operatorId) {
-                return true;
-            },
-            onOperatorUnselect: function() {
-                return true;
+            interFace: {
+                onOperatorSelect: function(operatorId) {
+                    return true;
+                },
+                onOperatorUnselect: function() {
+                    return true;
+                },
+                onLinkSelect: function(linkId) {
+                    return true;
+                },
+                onLinkUnselect: function() {
+                    return true;
+                },
+                showTips: function(tipStr) {
+                    return true;
+                }
             },
             onOperatorMouseOver: function(operatorId) {
                 return true;
@@ -33,12 +44,7 @@ $(function() {
             onOperatorMouseOut: function(operatorId) {
                 return true;
             },
-            onLinkSelect: function(linkId) {
-                return true;
-            },
-            onLinkUnselect: function() {
-                return true;
-            },
+
             onOperatorCreate: function(operatorId, operatorData, fullElement) {
                 return true;
             },
@@ -52,7 +58,7 @@ $(function() {
                 return true;
             },
             onOperatorMoved: function(operatorId, position) {
-
+                return true;
             }
         },
         data: null,
@@ -809,7 +815,7 @@ $(function() {
 
         unselectOperator: function() {
             if (this.selectedOperatorId != null) {
-                if (!this.options.onOperatorUnselect()) {
+                if (!this.options.interFace.onOperatorUnselect()) {
                     return;
                 }
                 this._removeSelectedClassOperators();
@@ -822,7 +828,7 @@ $(function() {
         },
 
         selectOperator: function(operatorId) {
-            if (!this.options.onOperatorSelect(operatorId)) {
+            if (!this.options.interFace.onOperatorSelect(operatorId)) {
                 return;
             }
             this.unselectLink();
@@ -951,7 +957,7 @@ $(function() {
 
         unselectLink: function() {
             if (this.selectedLinkId != null) {
-                if (!this.options.onLinkUnselect()) {
+                if (!this.options.interFace.onLinkUnselect()) {
                     return;
                 }
                 this.unBoldLink(this.selectedLinkId);
@@ -961,7 +967,7 @@ $(function() {
 
         selectLink: function(linkId) {
             this.unselectLink();
-            if (!this.options.onLinkSelect(linkId)) {
+            if (!this.options.interFace.onLinkSelect(linkId)) {
                 return;
             }
             this.unselectOperator();
@@ -1193,20 +1199,25 @@ $(function() {
         getReturnValue: function(linkData) {
             //linkData即this.data.links
             var Report = [];
-            for (var link in linkData) {
+            for (var i in linkData) {
+                var link = linkData[i];
+
+                var $name = [];
+                var $mode = "";
+                var $head = [];
+                var $tail = [];
+
                 if (typeof link != "undefined" && link.type == "OO") {
-                    var $name = this.getLinkTitle("l" + String(i));
-                    var $mode = "OO";
+                    $name.push(this.getLinkTitle(String(i)));
+                    $mode = "OO";
                     var fromOperatorId = link.fromOperator;
-                    var $head = this.getOperatorTitle(fromOperatorId);
+                    $head.push(this.getOperatorTitle(fromOperatorId));
                     var toOperatorId = link.toOperator;
-                    var $tail = this.getOperatorTitle(toOperatorId);
+                    $tail.push(this.getOperatorTitle(toOperatorId));
                 } else if (typeof link != "undefined" && link.type == "OM") {
-                    var $name = [];
-                    var $mode = "OM";
+                    $mode = "OM";
                     var fromOperatorId = link.fromOperator;
-                    var $head = this.getOperatorTitle(fromOperatorId);
-                    var $tail = [];
+                    $head.push(this.getOperatorTitle(fromOperatorId));
                     for (var j = 0; j < link.siblings.length; j++) {
                         $name.push(this.getLinkTitle(link.siblings[j]));
                         var toOperatorId = linkData[link.siblings[j]].toOperator;
@@ -1216,11 +1227,9 @@ $(function() {
                         delete linkData[link.siblings[j]];
                     }
                 } else if (typeof link != "undefined" && link.type == "MO") {
-                    var $name = [];
-                    var $mode = "MO";
+                    $mode = "MO";
                     var toOperatorId = link.toOperator;
-                    var $head = [];
-                    var $tail = this.getOperatorTitle(toOperatorId);
+                    $tail.push(this.getOperatorTitle(toOperatorId));
                     for (var j = 0; j < link.siblings.length; j++) {
                         $name.push(this.getLinkTitle(link.siblings[j]));
                         var fromOperatorId = linkData[link.siblings[j]].fromOperator;
@@ -1304,6 +1313,7 @@ $(function() {
         // 调用 this.getReturnValue() 
         // 生成描述流图的对象，发送至服务器 
         submit: function() {
+            this.options.interFace.showTips("test");
             console.log(this.data);
             var linkData = [];
             var obj = {};
@@ -1311,6 +1321,8 @@ $(function() {
             obj.Edge = new Array();
             linkData = $.extend(true, {}, this.data.links);
             this.report = this.getReturnValue(linkData);
+            console.log(this.report);
+
             for (var i = 0; i < this.report.length; i++) {
                 var set = {};
                 set.Name = new Array();
