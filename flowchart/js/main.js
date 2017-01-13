@@ -18,13 +18,13 @@ $(document).ready(function() {
     var currentDivDisplayed = 2;
     $("#accordion-element-1").on('show.bs.collapse', function() {
         $("#flowchartdiv1").show();
-        currentDivDisplayed+=1;
+        currentDivDisplayed += 1;
         var currentAccordionDivHeight = heightForTwoDfddraw / currentDivDisplayed;
         $(".flowchart-example-container").height(currentAccordionDivHeight);
     });
     $("#accordion-element-1").on('hide.bs.collapse', function() {
         $("#flowchartdiv1").hide();
-        currentDivDisplayed-=1;
+        currentDivDisplayed -= 1;
         if (currentDivDisplayed > 0) {
             var currentAccordionDivHeight = heightForTwoDfddraw / currentDivDisplayed;
             $(".flowchart-example-container").height(currentAccordionDivHeight);
@@ -32,7 +32,7 @@ $(document).ready(function() {
     });
     $("#accordion-element-2").on('show.bs.collapse', function() {
         $("#flowchartdiv2").show();
-        currentDivDisplayed+=1;
+        currentDivDisplayed += 1;
         var currentAccordionDivHeight = heightForTwoDfddraw / currentDivDisplayed;
         $(".flowchart-example-container").height(currentAccordionDivHeight);
     });
@@ -194,7 +194,6 @@ $(document).ready(function() {
 
     //btn-new1
     $("#btn-new1").click(function() {
-        console.log("1");
         var operatorId = 'o' + operatorI;
         var operatorData = {
             top: initTop1,
@@ -226,7 +225,6 @@ $(document).ready(function() {
 
     //btn-new2
     $("#btn-new2").click(function() {
-        console.log("2");
         var operatorId = 'o' + operatorI;
         var operatorData = {
             top: initTop2,
@@ -262,24 +260,38 @@ $(document).ready(function() {
         $dfd2.flowchart('deleteSelected');
     });
 
+    //初始默认为OO模式
+    $("#btn-OO").addClass("btn-info");
+
     //btn-OOOMMO
     $("#btn-OO").click(function() {
+        $("#btn-OO").addClass("btn-info");
+        $("#btn-OM").removeClass("btn-info");
+        $("#btn-MO").removeClass("btn-info");
+        $dfd1.flowchart('linkdone');
+        $dfd2.flowchart('linkdone');
         $dfd1.flowchart('mode1');
         $dfd2.flowchart('mode1');
     });
 
     $("#btn-OM").click(function() {
+        $("#btn-OO").removeClass("btn-info");
+        $("#btn-OM").addClass("btn-info");
+        $("#btn-MO").removeClass("btn-info");
+        $dfd1.flowchart('linkdone');
+        $dfd2.flowchart('linkdone');
         $dfd1.flowchart('mode2');
         $dfd2.flowchart('mode2');
     });
 
     $("#btn-MO").click(function() {
-        $dfd1.flowchart('mode3');
-        $dfd2.flowchart('mode3');
-    });
-    $("#btn-OO").click(function() {
+        $("#btn-OO").removeClass("btn-info");
+        $("#btn-OM").removeClass("btn-info");
+        $("#btn-MO").addClass("btn-info");
         $dfd1.flowchart('linkdone');
         $dfd2.flowchart('linkdone');
+        $dfd1.flowchart('mode3');
+        $dfd2.flowchart('mode3');
     });
 
     //btn-submit

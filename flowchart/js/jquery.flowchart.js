@@ -13,6 +13,8 @@ $(function() {
             defaultLinkColor: 'black',
             defaultSelectedLinkColor: 'blue',
             defaultOperatorsColorAndBold: "1px solid #CCCCCC",
+            defaultOperatorsColor: " solid #CCCCCC",
+            defaultOperatorsBold: "1px solid ",
             linkWidth: 2,
             linkSelectedWidth: 3,
             grid: 20,
@@ -63,23 +65,23 @@ $(function() {
         selectedLinkId: null,
         positionRatio: 1,
         globalId: null,
-        mode: 1,                        // 记录当前连线模式的flag
+        mode: 1, // 记录当前连线模式的flag
 
-        record: 0,                      // 记录当前是否需要保存新增边linkID的flag
+        record: 0, // 记录当前是否需要保存新增边linkID的flag
 
-        recordArray: [],                // 在用户创建OM或MO模式新枝（点击Done按键之前）过程中保存用户创建的新的连线的数组
+        recordArray: [], // 在用户创建OM或MO模式新枝（点击Done按键之前）过程中保存用户创建的新的连线的数组
 
-        dictionary_1: new Array(),		// 字典数据结构，以节点为key，保存以该节点为起始节点的OM连线
+        dictionary_1: new Array(), // 字典数据结构，以节点为key，保存以该节点为起始节点的OM连线
 
-        dictionary_2: new Array(),		// 字典数据结构，以节点为key，保存以该节点为终止节点的MO连线
+        dictionary_2: new Array(), // 字典数据结构，以节点为key，保存以该节点为终止节点的MO连线
 
-        dictionary_3: new Array(),		// 字典数据结构，以节点为key，保存该节点下OM连线的主干连线的数量，
-        								// 调用linkdone()函数之后递增，用于OM主干连线角度的设定，被_refreshLinkPositions()函数调用
+        dictionary_3: new Array(), // 字典数据结构，以节点为key，保存该节点下OM连线的主干连线的数量，
+        // 调用linkdone()函数之后递增，用于OM主干连线角度的设定，被_refreshLinkPositions()函数调用
 
-        dictionary_4: new Array(),		// 字典数据结构，以节点为key，保存该节点下MO连线的主干连线的数量
-        								// 调用linkdone()函数之后递增，用于MO主干连线角度的设定，被_refreshLinkPositions()函数调用
+        dictionary_4: new Array(), // 字典数据结构，以节点为key，保存该节点下MO连线的主干连线的数量
+        // 调用linkdone()函数之后递增，用于MO主干连线角度的设定，被_refreshLinkPositions()函数调用
 
-        report: [],						// 保存每一次的调用getReturnValue()函数的返回值
+        report: [], // 保存每一次的调用getReturnValue()函数的返回值
 
         // the constructor
         _create: function() {
@@ -141,6 +143,7 @@ $(function() {
         },
 
         // 初始化状态
+        //*****关于这里的事件*****
         _initEvents: function() {
 
             var self = this;
@@ -487,19 +490,19 @@ $(function() {
             }
 
             if (linkData.mode == 2) {
-                var toX2 = fromX + 100 * Math.sin(Math.PI / 6 * this.calc(linkData.OMNum));
-                var toY2 = fromY - 100 * Math.cos(Math.PI / 6 * this.calc(linkData.OMNum));
+                var toX2 = fromX + 50 * Math.sin(Math.PI / 6 * this.calc(linkData.OMNum));
+                var toY2 = fromY - 50 * Math.cos(Math.PI / 6 * this.calc(linkData.OMNum));
                 linkData.internal.els.path.setAttribute("d", 'M' + bezierFromX + ',' + (fromY) + ' C' + (fromX + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + fromY + ' ' + (toX2 - bezierIntensity) + ',' + toY2 + ' ' + toX2 + ',' + toY2 + 'M' + (toX2) + ',' + (toY2) + 'C' + (toX2 + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + toY2 + ' ' + (toX - bezierIntensity) + ',' + toY + ' ' + bezierToX + ',' + toY);
-                linkData.internal.els.path_text.setAttribute("x", fromX + 100 + (toX - fromX - 100) / 2);
+                linkData.internal.els.path_text.setAttribute("x", fromX + 50 + (toX - fromX - 50) / 2);
                 linkData.internal.els.path_text.setAttribute("y", fromY + (toY - fromY) / 2 - 10);
                 linkData.type = "OM";
             }
 
             if (linkData.mode == 3) {
-                var toX3 = toX - 100 * Math.sin(Math.PI / 6 * this.calc(linkData.MONum));
-                var toY3 = toY - 100 * Math.cos(Math.PI / 6 * this.calc(linkData.MONum));
+                var toX3 = toX - 50 * Math.sin(Math.PI / 6 * this.calc(linkData.MONum));
+                var toY3 = toY - 50 * Math.cos(Math.PI / 6 * this.calc(linkData.MONum));
                 linkData.internal.els.path.setAttribute("d", 'M' + bezierFromX + ',' + (fromY) + ' C' + (fromX + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + fromY + ' ' + (toX3 - bezierIntensity) + ',' + toY3 + ' ' + toX3 + ',' + toY3 + 'M' + (toX3) + ',' + (toY3) + 'C' + (toX3) + ',' + toY3 + ' ' + (toX - bezierIntensity) + ',' + toY + ' ' + bezierToX + ',' + toY);
-                linkData.internal.els.path_text.setAttribute("x", fromX + (toX - 100 - fromX) / 2);
+                linkData.internal.els.path_text.setAttribute("x", fromX + (toX - 50 - fromX) / 2);
                 linkData.internal.els.path_text.setAttribute("y", fromY + (toY - fromY) / 2 - 10);
                 linkData.type = "MO";
             }
@@ -823,7 +826,7 @@ $(function() {
                 return;
             }
             this.unselectLink();
-            
+
             this._removeSelectedClassOperators();
             this._addSelectedClass(operatorId);
             this.selectedOperatorId = operatorId;
@@ -898,31 +901,40 @@ $(function() {
 
         // 控制连线及其名称粗细变化的接口
         boldLink: function(linkId, width) {
-        	var linkData = this.data.links[linkId];
-        	linkData.internal.els.path.setAttribute('stroke-width', width);
-        	linkData.internal.els.path_text.style.fontWeight = 'bold'; 
+            var linkData = this.data.links[linkId];
+            linkData.internal.els.path.setAttribute('stroke-width', width);
+            linkData.internal.els.path_text.style.fontWeight = 'bold';
         },
-		// 控制连线及其名称粗细还原的接口
+        // 控制连线及其名称粗细还原的接口
         unBoldLink: function(linkId) {
-        	var linkData = this.data.links[linkId];
-        	linkData.internal.els.path.setAttribute('stroke-width', this.options.linkWidth);
-        	linkData.internal.els.path_text.style.fontWeight = 'normal'; 
+            var linkData = this.data.links[linkId];
+            linkData.internal.els.path.setAttribute('stroke-width', this.options.linkWidth);
+            linkData.internal.els.path_text.style.fontWeight = 'normal';
         },
 
-        // 控制 operator 边框粗细和颜色的接口
-        // width_and_color 的赋值形式为"10px solid #CCCCCC"
-        boldAndColorOperator: function(operatorId, width_and_color) {
-        	var tdiv = this.data.operators[operatorId].internal.els.operator[0];
-        	console.log(tdiv.style.border);
-        	tdiv.style.border = width_and_color ;
-        },
-
-        unBoldAndColorOperator: function(operatorId) {
+        // 控制 operator 边框粗细的接口
+        boldOperator: function(operatorId, width) {
             var tdiv = this.data.operators[operatorId].internal.els.operator[0];
-            console.log(tdiv.style.border);
+            tdiv.style.border = width + this.options.defaultOperatorsColor;
+        },
+
+        // 控制 operator 边框粗细还原的接口
+        unBoldOperator: function(operatorId) {
+            var tdiv = this.data.operators[operatorId].internal.els.operator[0];
             tdiv.style.border = this.options.defaultOperatorsColorAndBold;
         },
-        
+
+        // 控制 operator 边框颜色的接口
+        colorOperator: function(operatorId, color) {
+            var tdiv = this.data.operators[operatorId].internal.els.operator[0];
+            tdiv.style.border = this.options.defaultOperatorsBold + color;
+        },
+
+        // 控制 operator 边框颜色还原的接口
+        unColorOperator: function(operatorId) {
+            var tdiv = this.data.operators[operatorId].internal.els.operator[0];
+            tdiv.style.border = this.options.defaultOperatorsColorAndBold;
+        },
 
         _connecterMouseOver: function(linkId) {
             if (this.selectedLinkId != linkId) {
@@ -1024,27 +1036,25 @@ $(function() {
             // 否则则根据 ditionary_1 中记录的 siblings 
             // 对被删除边的所有兄弟边的 siblings 属性数组进行更新
             if (linkData.type == "OM") {
-            	if (this.record == 1) {
-            		this.recordArray = this.deleteSiblings(this.recordArray, linkId);
-            	}
-            	else if (!!this.dictionary_1[fromOperator]) {
-	                var siblingArray = this.dictionary_1[fromOperator];
-	                for (var i = 0; i < siblingArray.length; i++) {
-	                    this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
-	                    this.dictionary_1[fromOperator] = this.deleteSiblings(this.dictionary_1[fromOperator], linkId);
-	                }
-            	}
+                if (this.record == 1) {
+                    this.recordArray = this.deleteSiblings(this.recordArray, linkId);
+                } else if (!!this.dictionary_1[fromOperator]) {
+                    var siblingArray = this.dictionary_1[fromOperator];
+                    for (var i = 0; i < siblingArray.length; i++) {
+                        this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
+                        this.dictionary_1[fromOperator] = this.deleteSiblings(this.dictionary_1[fromOperator], linkId);
+                    }
+                }
             } else if (linkData.type == "MO") {
-            	if (this.record == 1) {
-            		this.recordArray = this.deleteSiblings(this.recordArray, linkId);
-            	}
-            	else if (!!this.dictionary_2[toOperator]) {
-	                var siblingArray = this.dictionary_2[toOperator];
-	                for (var i = 0; i < siblingArray.length; i++) {
-	                    this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
-	                    this.dictionary_2[toOperator] = this.deleteSiblings(this.dictionary_2[toOperator], linkId);
-	                }
-	            }
+                if (this.record == 1) {
+                    this.recordArray = this.deleteSiblings(this.recordArray, linkId);
+                } else if (!!this.dictionary_2[toOperator]) {
+                    var siblingArray = this.dictionary_2[toOperator];
+                    for (var i = 0; i < siblingArray.length; i++) {
+                        this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
+                        this.dictionary_2[toOperator] = this.deleteSiblings(this.dictionary_2[toOperator], linkId);
+                    }
+                }
             }
 
             linkData.internal.els.overallGroup.remove();
@@ -1181,9 +1191,9 @@ $(function() {
         // 封装所有连线的信息
         // 被 submit() 函数调用
         getReturnValue: function(linkData) {
+            //linkData即this.data.links
             var Report = [];
-            for (var i = 1; i < this.linkNum; i++) {
-                var link = linkData["l" + String(i)];
+            for (var link in linkData) {
                 if (typeof link != "undefined" && link.type == "OO") {
                     var $name = this.getLinkTitle("l" + String(i));
                     var $mode = "OO";
@@ -1339,7 +1349,7 @@ $(function() {
                 }
 
                 obj.Edge[i] = set;
-                console.log("name: " + this.report[i].name + " type: " + this.report[i].type + " head: " + this.report[i].head + " tail: " + this.report[i].tail);
+                //console.log("name: " + this.report[i].name + " type: " + this.report[i].type + " head: " + this.report[i].head + " tail: " + this.report[i].tail);
             }
 
             var i = 0;
@@ -1371,7 +1381,6 @@ $(function() {
                     Input[0] = to;
                     Input_count++;
                 };
-
 
                 if (Output_count != 0) {
                     Output[Output_count] = from;
