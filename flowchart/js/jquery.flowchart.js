@@ -73,7 +73,7 @@ $(function() {
         globalId: null,
         mode: 1, // 记录当前连线模式的flag
 
-        record: 0, // 记录当前是否需要保存新增边linkID的flag
+        operatorRecordForSwitch: "",
 
         recordArray: [], // 在用户创建OM或MO模式新枝（点击Done按键之前）过程中保存用户创建的新的连线的数组
 
@@ -229,18 +229,33 @@ $(function() {
         },
 
         // 添加 link，只在 connectors clicked 的时候被调用
-        // 设置 linkId 的格式为: “link” + linkNum
+        // 设置 linkId 的格式为: “l” + linkNum
         // 如果当前为 OM 或 MO 模式，则更新record并开始记录当前新增的linkId
         addLink: function(linkData) {
-            if (this.mode != 1) {
-                this.record = 1;
+            //OM模式下如果切换了起点则要linkdone
+            if (this.mode == 2) {
+                if (operatorRecordForSwitch != linkData.fromOperator) {
+                    this.linkdone();
+                    operatorRecordForSwitch = linkData.fromOperator;
+                }
             }
+
+            //MO模式下如果切换了终点则要linkdone
+            if (this.mode == 3) {
+                if (operatorRecordForSwitch != linkData.toOperator) {
+                    this.linkdone();
+                    operatorRecordForSwitch = linkData.toOperator;
+                }
+            }
+
             var linkId = "l" + String(this.linkNum);
             this.createLink(linkId, linkData);
-            if (this.record == 1) {
+
+            if (this.mode != 1) {
+                // 意味着是在 OM 或 MO 模式下添加的边，加入到this.recordArray中
+                // OO 模式是不会去修改recordArray的，recordArray这也是linkdone的关键
                 this.recordArray.push(linkId);
             }
-            return this.linkNum;
         },
 
         // 在 setData 函数中被调用
@@ -493,6 +508,9 @@ $(function() {
             }
 
             if (linkData.mode == 2) {
+                //OM或MO时通过 linkData.OMNum 来计算角度不够合理
+                //试想第一个位置被占据了，第二次则用第二个位置
+                //现在删掉第一个，再增加第三个还是用的第二个的位置，和第二个重叠
                 var toX2 = fromX + 50 * Math.sin(Math.PI / 6 * this.calc(linkData.OMNum));
                 var toY2 = fromY - 50 * Math.cos(Math.PI / 6 * this.calc(linkData.OMNum));
                 linkData.internal.els.path.setAttribute("d", 'M' + bezierFromX + ',' + (fromY) + ' C' + (fromX + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + fromY + ' ' + (toX2 - bezierIntensity) + ',' + toY2 + ' ' + toX2 + ',' + toY2 + 'M' + (toX2) + ',' + (toY2) + 'C' + (toX2 + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + toY2 + ' ' + (toX - bezierIntensity) + ',' + toY + ' ' + bezierToX + ',' + toY);
@@ -1047,7 +1065,6 @@ $(function() {
                 }
                 if (this.data.links[linkId].siblings.length == 0)
                     this.dictionary_3[fromOperator] -= 1;
-                console.log(this.dictionary_3[fromOperator]);
             } else if (linkData.type == "MO") {
                 var siblingArray = this.dictionary_2[toOperator];
                 for (var i = 0; i < siblingArray.length; i++) {
@@ -1122,12 +1139,10 @@ $(function() {
 
         mode2: function() {
             this.mode = 2;
-            this.record = 1;
         },
 
         mode3: function() {
             this.mode = 3;
-            this.record = 1;
         },
 
         setOperatorTitle: function(operatorId, title) {
@@ -1289,9 +1304,8 @@ $(function() {
                     this.dictionary_4[toOperatorId]++;
                 }
             }
-
+            operatorRecordForSwitch = "";
             this.recordArray = [];
-            this.record = 0;
         },
 
         // 用户点击 Submit 按键之后的操作
@@ -1302,16 +1316,19 @@ $(function() {
             if (this.recordArray.length > 0)
                 this.linkdone();
 
-            this.options.interFace.showTips("test");
+            //submit的时候当前的状态，this.data
             console.log(this.data);
-            var linkData = [];
-            var obj = {};
-            var ii = 0;
-            obj.Edge = new Array();
-            linkData = $.extend(true, {}, this.data.links);
+
+            //link的数据全部处理到this.report中
+            //每条边包含name、type、head、tail
+            //只有type不为数组
+            var linkData = $.extend(true, {}, this.data.links);
             this.report = this.getReturnValue(linkData);
             console.log(this.report);
 
+            var obj = {};
+            var ii = 0;
+            obj.Edge = new Array();
             for (var i = 0; i < this.report.length; i++) {
                 var set = {};
                 set.Name = new Array();
@@ -1360,6 +1377,7 @@ $(function() {
             obj.Output = new Array();
             obj.DFDID = 1;
             obj.Node = new Array();
+
             var dataout = this.data;
             for (var count in dataout.operators) {
                 var t = this.getOperatorTitle(count);
