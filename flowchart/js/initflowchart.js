@@ -13,8 +13,6 @@ function initFlowchart() {
     var $operatorTitle = $('#operator_title');
     var $linkTitle = $('#link_title');
     var $deleteButton = $('#btn-delete');
-    var $dfd1 = $('#flowchartdiv1');
-    var $dfd2 = $('#flowchartdiv2');
 
     //两个图的接口设置
     //############################################################
@@ -23,7 +21,7 @@ function initFlowchart() {
         onOperatorSelect: function(operatorId) {
             $deleteButton.removeAttr("disabled");
             $operatorProperties.show();
-            $operatorTitle.val($dfd1.flowchart('getOperatorTitle', operatorId));
+            $operatorTitle.val($('#flowchartdiv1').flowchart('getOperatorTitle', operatorId));
             return true;
         },
         onOperatorUnselect: function() {
@@ -34,7 +32,7 @@ function initFlowchart() {
         onLinkSelect: function(linkId) {
             $deleteButton.removeAttr("disabled");
             $linkProperties.show();
-            $linkTitle.val($dfd1.flowchart('getLinkTitle', linkId));
+            $linkTitle.val($('#flowchartdiv1').flowchart('getLinkTitle', linkId));
             return true;
         },
         onLinkUnselect: function() {
@@ -50,7 +48,7 @@ function initFlowchart() {
         onOperatorSelect: function(operatorId) {
             $("#btn-delete").removeAttr("disabled");
             $operatorProperties.show();
-            $operatorTitle.val($dfd2.flowchart('getOperatorTitle', operatorId));
+            $operatorTitle.val($('#flowchartdiv2').flowchart('getOperatorTitle', operatorId));
             return true;
         },
         onOperatorUnselect: function() {
@@ -61,7 +59,7 @@ function initFlowchart() {
         onLinkSelect: function(linkId) {
             $("#btn-delete").removeAttr("disabled");
             $linkProperties.show();
-            $linkTitle.val($dfd2.flowchart('getLinkTitle', linkId));
+            $linkTitle.val($('#flowchartdiv2').flowchart('getLinkTitle', linkId));
             return true;
         },
         onLinkUnselect: function() {
@@ -101,7 +99,7 @@ function initFlowchart() {
         },
         links: {}
     };
-    $dfd1.flowchart({
+    $('#flowchartdiv1').flowchart({
         data: data,
         interFace: interface1,
     });
@@ -136,7 +134,7 @@ function initFlowchart() {
         links: {}
     };
 
-    $dfd2.flowchart({
+    $('#flowchartdiv2').flowchart({
         data: data,
         interFace: interface2,
     });
@@ -147,30 +145,29 @@ function initFlowchart() {
 
     //设置node和link的名字更改
     $operatorTitle.keyup(function() {
-        var selectedOperatorId1 = $dfd1.flowchart('getSelectedOperatorId');
+        var selectedOperatorId1 = $('#flowchartdiv1').flowchart('getSelectedOperatorId');
         if (selectedOperatorId1 != null) {
-            $dfd1.flowchart('setOperatorTitle', selectedOperatorId1, $operatorTitle.val());
+            $('#flowchartdiv1').flowchart('setOperatorTitle', selectedOperatorId1, $operatorTitle.val());
         }
-        var selectedOperatorId2 = $dfd2.flowchart('getSelectedOperatorId');
+        var selectedOperatorId2 = $('#flowchartdiv2').flowchart('getSelectedOperatorId');
         if (selectedOperatorId2 != null) {
-            $dfd2.flowchart('setOperatorTitle', selectedOperatorId2, $operatorTitle.val());
+            $('#flowchartdiv2').flowchart('setOperatorTitle', selectedOperatorId2, $operatorTitle.val());
         }
     });
     $linkTitle.keyup(function() {
-        var selectedLinkId1 = $dfd1.flowchart('getSelectedLinkId');
+        var selectedLinkId1 = $('#flowchartdiv1').flowchart('getSelectedLinkId');
         if (selectedLinkId1 != null) {
-            $dfd1.flowchart('setLinkTitle', selectedLinkId1, $linkTitle.val());
+            $('#flowchartdiv1').flowchart('setLinkTitle', selectedLinkId1, $linkTitle.val());
         }
-        var selectedLinkId2 = $dfd2.flowchart('getSelectedLinkId');
+        var selectedLinkId2 = $('#flowchartdiv2').flowchart('getSelectedLinkId');
         if (selectedLinkId2 != null) {
-            $dfd2.flowchart('setLinkTitle', selectedLinkId2, $linkTitle.val());
+            $('#flowchartdiv2').flowchart('setLinkTitle', selectedLinkId2, $linkTitle.val());
         }
     });
 }
 
 //新建节点1
 function newNode1() {
-    var $dfd1 = $('#flowchartdiv1');
     var operatorId = 'o' + operatorI;
     var operatorData = {
         top: initTop1,
@@ -197,12 +194,11 @@ function newNode1() {
     initLeft1 = initLeft1 + 20;
     operatorI++;
 
-    $dfd1.flowchart('createOperator', operatorId, operatorData);
+    $('#flowchartdiv1').flowchart('createOperator', operatorId, operatorData);
 }
 
 //新建节点2
 function newNode2() {
-    var $dfd2 = $('#flowchartdiv2');
     var operatorId = 'o' + operatorI;
     var operatorData = {
         top: initTop2,
@@ -229,50 +225,108 @@ function newNode2() {
     initLeft2 = initLeft2 + 20;
     operatorI++;
 
-    $dfd2.flowchart('createOperator', operatorId, operatorData);
+    $('#flowchartdiv2').flowchart('createOperator', operatorId, operatorData);
 }
 
 //
 function delNodeOrLink() {
-    var $dfd1 = $('#flowchartdiv1');
-    var $dfd2 = $('#flowchartdiv2');
-    $dfd1.flowchart('deleteSelected');
-    $dfd2.flowchart('deleteSelected');
+    $('#flowchartdiv1').flowchart('deleteSelected');
+    $('#flowchartdiv2').flowchart('deleteSelected');
 }
 
 //
 function mode1Choosen() {
-    var $dfd1 = $('#flowchartdiv1');
-    var $dfd2 = $('#flowchartdiv2');
-    $dfd1.flowchart('linkdone');
-    $dfd2.flowchart('linkdone');
-    $dfd1.flowchart('mode1');
-    $dfd2.flowchart('mode1');
+    $('#flowchartdiv1').flowchart('linkdone');
+    $('#flowchartdiv2').flowchart('linkdone');
+    $('#flowchartdiv1').flowchart('mode1');
+    $('#flowchartdiv2').flowchart('mode1');
 }
 
 //
 function mode2Choosen() {
-    var $dfd1 = $('#flowchartdiv1');
-    var $dfd2 = $('#flowchartdiv2');
-    $dfd1.flowchart('linkdone');
-    $dfd2.flowchart('linkdone');
-    $dfd1.flowchart('mode2');
-    $dfd2.flowchart('mode2');
+    $('#flowchartdiv1').flowchart('linkdone');
+    $('#flowchartdiv2').flowchart('linkdone');
+    $('#flowchartdiv1').flowchart('mode2');
+    $('#flowchartdiv2').flowchart('mode2');
 }
 
 //
 function mode3Choosen() {
-    var $dfd1 = $('#flowchartdiv1');
-    var $dfd2 = $('#flowchartdiv2');
-    $dfd1.flowchart('linkdone');
-    $dfd2.flowchart('linkdone');
-    $dfd1.flowchart('mode3');
-    $dfd2.flowchart('mode3');
+    $('#flowchartdiv1').flowchart('linkdone');
+    $('#flowchartdiv2').flowchart('linkdone');
+    $('#flowchartdiv1').flowchart('mode3');
+    $('#flowchartdiv2').flowchart('mode3');
 }
 
 function flowChartSubmit() {
-    var $dfd1 = $('#flowchartdiv1');
-    var $dfd2 = $('#flowchartdiv2');
-    $dfd1.flowchart('submit');
-    $dfd2.flowchart('submit');
+    var ans1 = $('#flowchartdiv1').flowchart('submit');
+    if (ans1 == 0)
+        console.log("******************** bad DFD ********************");
+    else {
+        ans1.DFDID = 1;
+        console.log("***DFDID***");
+        console.log(ans1.DFDID);
+        console.log("******************** good DFD ********************");
+    }
+
+    var ans2 = $('#flowchartdiv2').flowchart('submit');
+    if (ans2 == 0)
+        console.log("******************** bad DFD ********************");
+    else {
+        ans2.DFDID = 2;
+        console.log("***DFDID***");
+        console.log(ans2.DFDID);
+        console.log("******************** good DFD ********************");
+    }
+
+    //这里return ans1 和 ans2
+
+    //还要返回两个图的名字和ID的字典
+
+}
+
+//控制接口
+/*
+// 控制连线及其名称颜色变化的接口
+colorizeLink: function(linkId, color)
+// 控制连线及其名称颜色还原的接口
+unColorizeLink: function(linkId)
+// 控制 operator 边框颜色的接口
+colorOperator: function(operatorId, color)
+// 控制 operator 边框颜色还原的接口
+unColorOperator: function(operatorId)
+*/
+
+function dfd1ColorizeLink(linkId, color)
+{
+    $('#flowchartdiv1').flowchart('colorizeLink', linkId, color);
+}
+function dfd1UnColorizeLink(linkId)
+{
+    $('#flowchartdiv1').flowchart('unColorizeLink', linkId);
+}
+function dfd1ColorOperator(operatorId, color)
+{
+    $('#flowchartdiv1').flowchart('colorOperator', operatorId, color);
+}
+function dfd1UnColorOperator(operatorId)
+{
+    $('#flowchartdiv1').flowchart('unColorOperator', operatorId);
+}
+
+function dfd2ColorizeLink(linkId, color)
+{
+    $('#flowchartdiv2').flowchart('colorizeLink', linkId, color);
+}
+function dfd2UnColorizeLink(linkId)
+{
+    $('#flowchartdiv2').flowchart('unColorizeLink', linkId);
+}
+function dfd2ColorOperator(operatorId, color)
+{
+    $('#flowchartdiv2').flowchart('colorOperator', operatorId, color);
+}
+function dfd2UnColorOperator(operatorId)
+{
+    $('#flowchartdiv2').flowchart('unColorOperator', operatorId);
 }
