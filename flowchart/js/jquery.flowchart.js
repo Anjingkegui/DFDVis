@@ -1272,6 +1272,17 @@ $(function() {
             }
         },
 
+        //此函数用于检测数组中是否有重复元素
+        isRepeat: function(arr) {
+            var hash = {};
+            for (var i in arr) {
+                if (hash[arr[i]])
+                    return true;
+                hash[arr[i]] = true;
+            }
+            return false;
+        },
+
         // 用户点击 Done 按键之后的操作
         // 更新 dictionary_1 或 dictionary_2 的内容
         // 为 dictionary_3 或 dictionary_4 的对应节点递增计数
@@ -1342,6 +1353,13 @@ $(function() {
                 ]
             }
             */
+            /*
+            合法性检查：
+            1.Node名只能是大写加数字，不能有空格
+            2.link名只能是小写加数字，不能有空格
+            3.Node和Link均无重名
+            4.link模式应该是对的才行
+            */
 
             var obj = {};
             obj.Edge = new Array();
@@ -1349,13 +1367,24 @@ $(function() {
             obj.Output = new Array();
             obj.Node = new Array();
 
+            // flag=0意味着输入不合法
+            var flag = 1;
+
             //DFDID在调用外部设置
 
             //Edge
             //这里一条边一条边的处理
+            var linkNameArr = [];
             console.log("***Edge***");
             for (var i = 0; i < this.report.length; i++) {
                 obj.Edge[i] = this.report[i];
+                linkNameArr.push.apply(linkNameArr, obj.Edge[i].Name);
+
+                // 法则4
+                if ((obj.Edge[i].Type == "MO" || obj.Edge[i].Type == "OM") && obj.Edge[i].Name.length <= 1) {
+                    obj.Edge[i].Type = "OO";
+                }
+
                 console.log("name:" + obj.Edge[i].Name + " type:" + obj.Edge[i].Type + " head:" + obj.Edge[i].Head + " tail:" + obj.Edge[i].Tail);
             }
 
@@ -1390,13 +1419,62 @@ $(function() {
                 if ($.inArray(obj.Node[opnameIdx], NodeHasOutput) == -1)
                     obj.Output.push(obj.Node[opnameIdx]);
             }
-            console.log("***Input & Output***");
+            console.log("***Input***");
             console.log(obj.Input);
+            console.log("***Output***");
             console.log(obj.Output);
-            console.log("************************************************");
 
-            return obj;
+            //法则1,2,3
+            //node名重复
+            if (this.isRepeat(obj.Node)) {
+                flag = 0;
+                this.options.interFace.showTips("The name of the nodes can not be duplicated.");
+            }
+            //link名重复
+            if (this.isRepeat(linkNameArr)) {
+                flag = 0;
+                this.options.interFace.showTips("The name of the links can not be duplicated.");
+            }
+            //node名是否合法
+            var nodenameFlag = 1;
+            for (var i in obj.Node) {
+                var rgexp = new RegExp("[A-Z0-9]", "g");
+                var rgexpAns = obj.Node[i].match(rgexp);
+                if (rgexpAns.length != obj.Node[i].length) {
+                    nodenameFlag = 0;
+                    break;
+                }
+            }
+            if (nodenameFlag == 0) {
+                flag = 0;
+                this.options.interFace.showTips("The name of the nodes must consist of uppercase letters and numbers.");
+            }
+            //link名是否合法
+            var linknameFlag = 1;
+            for (var i in linkNameArr) {
+                var rgexp = new RegExp("[a-z0-9]", "g");
+                var rgexpAns = linkNameArr[i].match(rgexp);
+                if (rgexpAns.length != linkNameArr[i].length) {
+                    linknameFlag = 0;
+                    break;
+                }
+            }
+            if (linknameFlag == 0) {
+                flag = 0;
+                this.options.interFace.showTips("The name of the links must consist of lowercase letters and numbers.");
+            }
+
+
+            //结果非法
+            if (flag == 0) {
+                console.log("******************** bad DFD ********************");
+                return 0;
+            }
+            //结果合法
+            else {
+                console.log("******************** good DFD ********************");
+                return obj;
+            }
         }
-
     });
 });
