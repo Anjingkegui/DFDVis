@@ -73,7 +73,7 @@ $(function() {
         globalId: null,
         mode: 1, // 记录当前连线模式的flag
 
-        record: 0, // 记录当前是否需要保存新增边linkID的flag
+        operatorRecordForSwitch: "",
 
         recordArray: [], // 在用户创建OM或MO模式新枝（点击Done按键之前）过程中保存用户创建的新的连线的数组
 
@@ -229,18 +229,33 @@ $(function() {
         },
 
         // 添加 link，只在 connectors clicked 的时候被调用
-        // 设置 linkId 的格式为: “link” + linkNum
+        // 设置 linkId 的格式为: “l” + linkNum
         // 如果当前为 OM 或 MO 模式，则更新record并开始记录当前新增的linkId
         addLink: function(linkData) {
-            if (this.mode != 1) {
-                this.record = 1;
+            //OM模式下如果切换了起点则要linkdone
+            if (this.mode == 2) {
+                if (operatorRecordForSwitch != linkData.fromOperator) {
+                    this.linkdone();
+                    operatorRecordForSwitch = linkData.fromOperator;
+                }
             }
+
+            //MO模式下如果切换了终点则要linkdone
+            if (this.mode == 3) {
+                if (operatorRecordForSwitch != linkData.toOperator) {
+                    this.linkdone();
+                    operatorRecordForSwitch = linkData.toOperator;
+                }
+            }
+
             var linkId = "l" + String(this.linkNum);
             this.createLink(linkId, linkData);
-            if (this.record == 1) {
-                this.recordArray.push("l" + String(this.linkNum));
+
+            if (this.mode != 1) {
+                // 意味着是在 OM 或 MO 模式下添加的边，加入到this.recordArray中
+                // OO 模式是不会去修改recordArray的，recordArray这也是linkdone的关键
+                this.recordArray.push(linkId);
             }
-            return this.linkNum;
         },
 
         // 在 setData 函数中被调用
@@ -355,9 +370,6 @@ $(function() {
             }
 
             if (linkData.mode == 3) {
-                if (typeof this.dictionary_4 == "undefined") {
-                    this.dictionary_4 = new Array();
-                }
                 if (!!this.dictionary_4[toOperatorId] == false) {
                     this.dictionary_4[toOperatorId] = 1;
                 }
@@ -496,11 +508,14 @@ $(function() {
             }
 
             if (linkData.mode == 2) {
+                //OM或MO时通过 linkData.OMNum 来计算角度不够合理
+                //试想第一个位置被占据了，第二次则用第二个位置
+                //现在删掉第一个，再增加第三个还是用的第二个的位置，和第二个重叠
                 var toX2 = fromX + 50 * Math.sin(Math.PI / 6 * this.calc(linkData.OMNum));
                 var toY2 = fromY - 50 * Math.cos(Math.PI / 6 * this.calc(linkData.OMNum));
                 linkData.internal.els.path.setAttribute("d", 'M' + bezierFromX + ',' + (fromY) + ' C' + (fromX + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + fromY + ' ' + (toX2 - bezierIntensity) + ',' + toY2 + ' ' + toX2 + ',' + toY2 + 'M' + (toX2) + ',' + (toY2) + 'C' + (toX2 + offsetFromX + distanceFromArrow + bezierIntensity) + ',' + toY2 + ' ' + (toX - bezierIntensity) + ',' + toY + ' ' + bezierToX + ',' + toY);
-                linkData.internal.els.path_text.setAttribute("x", fromX + 50 + (toX - fromX - 50) / 2);
-                linkData.internal.els.path_text.setAttribute("y", fromY + (toY - fromY) / 2 - 10);
+                linkData.internal.els.path_text.setAttribute("x", toX2 + 50 + (toX - toX2 - 50) / 2);
+                linkData.internal.els.path_text.setAttribute("y", toY2 + (toY - toY2) / 2 - 10);
                 linkData.type = "OM";
             }
 
@@ -1036,31 +1051,28 @@ $(function() {
             var toOperator = linkData.toOperator;
             var toConnector = linkData.toConnector;
 
-            // 首先判断被删除连线的类型 （OM 或 MO）
-            // 如果当前并未点击 Done 按键，即尚未保存当前新构建的 OM 新枝
-            // 则从数组 this.recordArray 中删除当前连线的 Id
-            // 否则则根据 ditionary_1 中记录的 siblings 
+            //  OO 类型直接删掉即可
+            //  OM 或 MO 类型则要dictionary 和 siblings
+
+            // 首先判断被删除连线的类型
+            // 然后根据 dictionary 中记录的 siblings 
             // 对被删除边的所有兄弟边的 siblings 属性数组进行更新
             if (linkData.type == "OM") {
-                if (this.record == 1) {
-                    this.recordArray = this.deleteSiblings(this.recordArray, linkId);
-                } else if (!!this.dictionary_1[fromOperator]) {
-                    var siblingArray = this.dictionary_1[fromOperator];
-                    for (var i = 0; i < siblingArray.length; i++) {
-                        this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
-                        this.dictionary_1[fromOperator] = this.deleteSiblings(this.dictionary_1[fromOperator], linkId);
-                    }
+                var siblingArray = this.dictionary_1[fromOperator];
+                for (var i = 0; i < siblingArray.length; i++) {
+                    this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
+                    this.dictionary_1[fromOperator] = this.deleteSiblings(this.dictionary_1[fromOperator], linkId);
                 }
+                if (this.data.links[linkId].siblings.length == 0)
+                    this.dictionary_3[fromOperator] -= 1;
             } else if (linkData.type == "MO") {
-                if (this.record == 1) {
-                    this.recordArray = this.deleteSiblings(this.recordArray, linkId);
-                } else if (!!this.dictionary_2[toOperator]) {
-                    var siblingArray = this.dictionary_2[toOperator];
-                    for (var i = 0; i < siblingArray.length; i++) {
-                        this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
-                        this.dictionary_2[toOperator] = this.deleteSiblings(this.dictionary_2[toOperator], linkId);
-                    }
+                var siblingArray = this.dictionary_2[toOperator];
+                for (var i = 0; i < siblingArray.length; i++) {
+                    this.data.links[siblingArray[i]].siblings = this.deleteSiblings(this.data.links[siblingArray[i]].siblings, linkId);
+                    this.dictionary_2[toOperator] = this.deleteSiblings(this.dictionary_2[toOperator], linkId);
                 }
+                if (this.data.links[linkId].siblings.length == 0)
+                    this.dictionary_4[toOperator] -= 1;
             }
 
             linkData.internal.els.overallGroup.remove();
@@ -1104,6 +1116,7 @@ $(function() {
         },
 
         deleteSelected: function() {
+            this.linkdone();
             if (this.selectedLinkId != null) {
                 this.deleteLink(this.selectedLinkId);
             }
@@ -1126,12 +1139,10 @@ $(function() {
 
         mode2: function() {
             this.mode = 2;
-            this.record = 1;
         },
 
         mode3: function() {
             this.mode = 3;
-            this.record = 1;
         },
 
         setOperatorTitle: function(operatorId, title) {
@@ -1267,35 +1278,24 @@ $(function() {
             if (this.mode == 2 && this.recordArray.length > 0) {
                 var fromOperatorId = this.data.links[this.recordArray[0]].fromOperator;
                 if (!!this.dictionary_1[fromOperatorId]) {
-                    var id = this.dictionary_1[fromOperatorId];
                     for (var i = 0; i < this.recordArray.length; i++) {
-                        id.push(this.recordArray[i]);
+                        this.dictionary_1[fromOperatorId].push(this.recordArray[i]);
                     }
-                    this.dictionary_1[fromOperatorId] = id;
                 } else {
                     this.dictionary_1[fromOperatorId] = this.recordArray;
                 }
                 this.addSiblings(this.recordArray);
-
                 if (!!this.dictionary_3[fromOperatorId]) {
                     this.dictionary_3[fromOperatorId]++;
                 }
             }
 
             if (this.mode == 3 && this.recordArray.length > 0) {
-                if (typeof this.dictionary_2 == "undefined") {
-                    this.dictionary_2 = new Array();
-                }
-                if (typeof this.dictionary_4 == "undefined") {
-                    this.dictionary_4 = new Array();
-                }
                 var toOperatorId = this.data.links[this.recordArray[0]].toOperator;
                 if (!!this.dictionary_2[toOperatorId]) {
-                    var id = this.dictionary_2[toOperatorId];
                     for (var i = 0; i < this.recordArray.length; i++) {
-                        id.push(this.recordArray[i]);
+                        this.dictionary_2[toOperatorId].push(this.recordArray[i]);
                     }
-                    this.dictionary_2[toOperatorId] = id;
                 } else {
                     this.dictionary_2[toOperatorId] = this.recordArray;
                 }
@@ -1304,25 +1304,31 @@ $(function() {
                     this.dictionary_4[toOperatorId]++;
                 }
             }
-
+            operatorRecordForSwitch = "";
             this.recordArray = [];
-            this.record = 0;
         },
 
         // 用户点击 Submit 按键之后的操作
         // 调用 this.getReturnValue() 
         // 生成描述流图的对象，发送至服务器 
         submit: function() {
-            this.options.interFace.showTips("test");
+            //如果没有点击linkdone就submit
+            if (this.recordArray.length > 0)
+                this.linkdone();
+
+            //submit的时候当前的状态，this.data
             console.log(this.data);
-            var linkData = [];
-            var obj = {};
-            var ii = 0;
-            obj.Edge = new Array();
-            linkData = $.extend(true, {}, this.data.links);
+
+            //link的数据全部处理到this.report中
+            //每条边包含name、type、head、tail
+            //只有type不为数组
+            var linkData = $.extend(true, {}, this.data.links);
             this.report = this.getReturnValue(linkData);
             console.log(this.report);
 
+            var obj = {};
+            var ii = 0;
+            obj.Edge = new Array();
             for (var i = 0; i < this.report.length; i++) {
                 var set = {};
                 set.Name = new Array();
@@ -1371,6 +1377,7 @@ $(function() {
             obj.Output = new Array();
             obj.DFDID = 1;
             obj.Node = new Array();
+
             var dataout = this.data;
             for (var count in dataout.operators) {
                 var t = this.getOperatorTitle(count);
