@@ -12,9 +12,8 @@ $(function() {
             defaultLinkTitle: '',
             defaultLinkColor: 'black',
             defaultSelectedLinkColor: 'blue',
-            defaultOperatorsColorAndBold: "1px solid #CCCCCC",
-            defaultOperatorsColor: " solid #CCCCCC",
-            defaultOperatorsBold: "1px solid ",
+            defaultOperatorsColor: "#CCCCCC",
+            defaultOperatorsBold: "1px",
             linkWidth: 2,
             linkSelectedWidth: 3,
             grid: 20,
@@ -186,14 +185,6 @@ $(function() {
 
             this.objs.layers.links.on('mousedown touchstart', '.flowchart-link', function(e) {
                 e.stopImmediatePropagation();
-            });
-
-            this.objs.layers.links.on('mouseover', '.flowchart-link', function() {
-                self._connecterMouseOver($(this).data('link_id'));
-            });
-
-            this.objs.layers.links.on('mouseout', '.flowchart-link', function() {
-                self._connecterMouseOut($(this).data('link_id'));
             });
 
             this.objs.layers.links.on('click', '.flowchart-link', function() {
@@ -937,38 +928,25 @@ $(function() {
         // 控制 operator 边框粗细的接口
         boldOperator: function(operatorId, width) {
             var tdiv = this.data.operators[operatorId].internal.els.operator[0];
-            tdiv.style.border = width + this.options.defaultOperatorsColor;
+            tdiv.style['border-width'] = width;
         },
 
         // 控制 operator 边框粗细还原的接口
         unBoldOperator: function(operatorId) {
             var tdiv = this.data.operators[operatorId].internal.els.operator[0];
-            tdiv.style.border = this.options.defaultOperatorsColorAndBold;
+            tdiv.style['border-width'] = this.options.defaultOperatorsBold;
         },
 
         // 控制 operator 边框颜色的接口
         colorOperator: function(operatorId, color) {
             var tdiv = this.data.operators[operatorId].internal.els.operator[0];
-            tdiv.style.border = this.options.defaultOperatorsBold + color;
+            tdiv.style['border-color'] = color;
         },
 
         // 控制 operator 边框颜色还原的接口
         unColorOperator: function(operatorId) {
             var tdiv = this.data.operators[operatorId].internal.els.operator[0];
-            tdiv.style.border = this.options.defaultOperatorsColorAndBold;
-        },
-
-        _connecterMouseOver: function(linkId) {
-            if (this.selectedLinkId != linkId) {
-                this.colorizeLink(linkId, this._shadeColor(this.getLinkMainColor(linkId), -0.4));
-                //this.tooltip(linkId);
-            }
-        },
-
-        _connecterMouseOut: function(linkId) {
-            if (this.selectedLinkId != linkId) {
-                this.unColorizeLink(linkId);
-            }
+            tdiv.style['border-color'] = this.options.defaultOperatorsColor;
         },
 
         unselectLink: function() {
@@ -1329,7 +1307,7 @@ $(function() {
                 this.linkdone();
 
             //submit的时候当前的状态，this.data
-            //console.log(this.data);
+            console.log(this.data);
 
             //link的数据全部处理到this.report中
             //每条边包含name、type、head、tail
@@ -1466,15 +1444,12 @@ $(function() {
 
 
             //结果非法
-            if (flag == 0) {
-                console.log("******************** bad DFD ********************");
+            if (flag == 0)
                 return 0;
-            }
+
             //结果合法
-            else {
-                console.log("******************** good DFD ********************");
+            else
                 return obj;
-            }
         }
     });
 });
