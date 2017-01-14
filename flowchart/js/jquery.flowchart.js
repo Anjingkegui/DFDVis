@@ -752,7 +752,8 @@ $(function() {
                         var operatorId = $(this).data('operator_id');
                         operatorChangedPosition(operatorId, ui.position);
                         fullElement.operator.css({
-                            height: 'auto'
+                            height: 'auto',
+                            width: 'auto'
                         });
 
                         self.options.onOperatorMoved(operatorId, ui.position);
@@ -1252,10 +1253,10 @@ $(function() {
                 }
                 if (typeof link != "undefined") {
                     var report = {
-                        name: $name,
-                        type: $mode,
-                        head: $head,
-                        tail: $tail,
+                        Name: $name,
+                        Type: $mode,
+                        Head: $head,
+                        Tail: $tail,
                     };
                     Report.push(report);
                 }
@@ -1269,6 +1270,17 @@ $(function() {
                     this.data.links[linkArray[i]].siblings.push(linkArray[j]);
                 }
             }
+        },
+
+        //此函数用于检测数组中是否有重复元素
+        isRepeat: function(arr) {
+            var hash = {};
+            for (var i in arr) {
+                if (hash[arr[i]])
+                    return true;
+                hash[arr[i]] = true;
+            }
+            return false;
         },
 
         // 用户点击 Done 按键之后的操作
@@ -1317,151 +1329,152 @@ $(function() {
                 this.linkdone();
 
             //submit的时候当前的状态，this.data
-            console.log(this.data);
+            //console.log(this.data);
 
             //link的数据全部处理到this.report中
             //每条边包含name、type、head、tail
             //只有type不为数组
             var linkData = $.extend(true, {}, this.data.links);
             this.report = this.getReturnValue(linkData);
-            console.log(this.report);
+
+            //这个obj即是传递给服务端的obj
+            /*
+            示例：
+            {
+                "DFDID":1,
+                "Node":["A","B","C","D","E","F","G"],
+                "Input":["A"],
+                "Output":["F","G"],
+                "Edge":[
+                    {"Name":["b","c"], "Type":"OM", "Head":["A"], "Tail":["B","C"]},
+                    {"Name":["g"], "Type":"OO", "Head":["A"], "Tail":["G"]},
+                    {"Name":["d","e"], "Type":"OM", "Head":["B"], "Tail":["D","E"]},
+                    {"Name":["f1","f2","f3"], "Type":"MO", "Head":["D","E","C"], "Tail":["F"]}
+                ]
+            }
+            */
+            /*
+            合法性检查：
+            1.Node名只能是大写加数字，不能有空格
+            2.link名只能是小写加数字，不能有空格
+            3.Node和Link均无重名
+            4.link模式应该是对的才行
+            */
 
             var obj = {};
-            var ii = 0;
             obj.Edge = new Array();
-            for (var i = 0; i < this.report.length; i++) {
-                var set = {};
-                set.Name = new Array();
-                set.Type = this.report[i].type;
-                set.Head = new Array();
-                set.Tail = new Array();
-
-                if (typeof this.report[i].name == "object") {
-                    for (var s in this.report[i].name) {
-                        set.Name[ii] = this.report[i].name[s];
-                        ii++;
-                    }
-                    ii = 0;
-                } else {
-                    set.Name[0] = this.report[i].name;
-                }
-
-                if (typeof this.report[i].head == "object") {
-                    for (var s in this.report[i].head) {
-                        set.Head[ii] = this.report[i].head[s];
-                        ii++;
-                    }
-                    ii = 0;
-                } else {
-                    set.Head[0] = this.report[i].head;
-                }
-
-                if (typeof this.report[i].tail == "object") {
-                    for (var s in this.report[i].tail) {
-                        set.Tail[ii] = this.report[i].tail[s];
-                        ii++;
-                    }
-                    ii = 0;
-                } else {
-                    set.Tail[0] = this.report[i].tail;
-                }
-
-                obj.Edge[i] = set;
-                //console.log("name: " + this.report[i].name + " type: " + this.report[i].type + " head: " + this.report[i].head + " tail: " + this.report[i].tail);
-            }
-
-            var i = 0;
-            var input_count = 0;
-            var output_count = 0;
             obj.Input = new Array();
             obj.Output = new Array();
-            obj.DFDID = 1;
             obj.Node = new Array();
 
-            var dataout = this.data;
-            for (var count in dataout.operators) {
-                var t = this.getOperatorTitle(count);
-                obj.Node[i] = t;
-                i++
+            // flag=0意味着输入不合法
+            var flag = 1;
+
+            //DFDID在调用外部设置
+
+            //Edge
+            //这里一条边一条边的处理
+            var linkNameArr = [];
+            console.log("***Edge***");
+            for (var i = 0; i < this.report.length; i++) {
+                obj.Edge[i] = this.report[i];
+                linkNameArr.push.apply(linkNameArr, obj.Edge[i].Name);
+
+                // 法则4
+                if ((obj.Edge[i].Type == "MO" || obj.Edge[i].Type == "OM") && obj.Edge[i].Name.length <= 1) {
+                    obj.Edge[i].Type = "OO";
+                }
+
+                console.log("name:" + obj.Edge[i].Name + " type:" + obj.Edge[i].Type + " head:" + obj.Edge[i].Head + " tail:" + obj.Edge[i].Tail);
             }
 
-            var Input = new Array();
-            var Input_count = 0;
-            var Output = new Array();
-            var Output_count = 0;
-            for (var count2 in dataout.links) {
-                var from = this.getOperatorTitle(dataout.links[count2].toOperator);
-                var to = this.getOperatorTitle(dataout.links[count2].fromOperator);
+            //Node
+            var thisdata = this.data;
+            for (var operatorsID in thisdata.operators) {
+                var operatortitle = this.getOperatorTitle(operatorsID);
+                obj.Node.push(operatortitle);
+            }
+            console.log("***Node***");
+            console.log(obj.Node);
 
-                if (Input_count != 0) {
-                    Input[Input_count] = to;
-                    Input_count++;
-                } else {
-                    Input[0] = to;
-                    Input_count++;
-                };
+            //Input和Output
+            var NodeHasInput = new Array();
+            var NodeHasOutput = new Array();
 
-                if (Output_count != 0) {
-                    Output[Output_count] = from;
-                    Output_count++;
-                } else {
-                    Output[0] = from;
-                    Output_count++;
-                };
+            for (var linksID in thisdata.links) {
+                var headNodeName = this.getOperatorTitle(thisdata.links[linksID].fromOperator);
+                var tailNodeName = this.getOperatorTitle(thisdata.links[linksID].toOperator);
 
+                //headNodeName Has Output
+                //tailNodeName Has Input
+                if ($.inArray(headNodeName, NodeHasOutput) == -1)
+                    NodeHasOutput.push(headNodeName);
+                if ($.inArray(tailNodeName, NodeHasInput) == -1)
+                    NodeHasInput.push(tailNodeName);
             }
 
-            for (var k1 in Input) {
-                var check = 0;
-                if (Input[k1] != "UNDEFINED") {
-                    for (var k2 in Output) {
-                        if (Input[k1] == Output[k2]) {
-                            Output[k2] = "UNDEFINED";
-                            check = 1;
-                        }
-                    }
-                    if (check == 1) {
-                        var a = k1;
-                        var s = Input[k1];
-                        while (a != Input.length) {
-                            if (Input[a] == s) {
-                                Input[a] = "UNDEFINED";
-                            }
-                            a++;
-                        }
-                    }
+            for (var opnameIdx in obj.Node) {
+                if ($.inArray(obj.Node[opnameIdx], NodeHasInput) == -1)
+                    obj.Input.push(obj.Node[opnameIdx]);
+                if ($.inArray(obj.Node[opnameIdx], NodeHasOutput) == -1)
+                    obj.Output.push(obj.Node[opnameIdx]);
+            }
+            console.log("***Input***");
+            console.log(obj.Input);
+            console.log("***Output***");
+            console.log(obj.Output);
+
+            //法则1,2,3
+            //node名重复
+            if (this.isRepeat(obj.Node)) {
+                flag = 0;
+                this.options.interFace.showTips("The name of the nodes can not be duplicated.");
+            }
+            //link名重复
+            if (this.isRepeat(linkNameArr)) {
+                flag = 0;
+                this.options.interFace.showTips("The name of the links can not be duplicated.");
+            }
+            //node名是否合法
+            var nodenameFlag = 1;
+            for (var i in obj.Node) {
+                var rgexp = new RegExp("[A-Z0-9]", "g");
+                var rgexpAns = obj.Node[i].match(rgexp);
+                if (rgexpAns.length != obj.Node[i].length) {
+                    nodenameFlag = 0;
+                    break;
                 }
             }
-
-            for (var In in Input) {
-                if (Input[In] != "UNDEFINED") {
-
-                    for (var a in Input) {
-                        if (Input[In] == Input[a] && In != a) {
-                            Input[a] = "UNDEFINED";
-                        }
-                    }
-                    obj.Input[ii] = Input[In];
-                    ii++;
+            if (nodenameFlag == 0) {
+                flag = 0;
+                this.options.interFace.showTips("The name of the nodes must consist of uppercase letters and numbers.");
+            }
+            //link名是否合法
+            var linknameFlag = 1;
+            for (var i in linkNameArr) {
+                var rgexp = new RegExp("[a-z0-9]", "g");
+                var rgexpAns = linkNameArr[i].match(rgexp);
+                if (rgexpAns.length != linkNameArr[i].length) {
+                    linknameFlag = 0;
+                    break;
                 }
             }
-            ii = 0;
-            for (var Out in Output) {
-                if (Output[Out] != "UNDEFINED") {
-
-                    for (var a in Output) {
-                        if (Output[Out] == Output[a] && Out != a) {
-                            Output[a] = "UNDEFINED";
-                        }
-                    }
-                    obj.Output[ii] = Output[Out];
-                    ii++;
-                }
+            if (linknameFlag == 0) {
+                flag = 0;
+                this.options.interFace.showTips("The name of the links must consist of lowercase letters and numbers.");
             }
 
-            console.log(obj);
-            return obj;
+
+            //结果非法
+            if (flag == 0) {
+                console.log("******************** bad DFD ********************");
+                return 0;
+            }
+            //结果合法
+            else {
+                console.log("******************** good DFD ********************");
+                return obj;
+            }
         }
-
     });
 });

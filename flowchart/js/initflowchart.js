@@ -83,7 +83,7 @@ function initFlowchart() {
                 top: initTop1,
                 left: initLeft1,
                 properties: {
-                    title: 'node' + operatorI,
+                    title: 'NODE' + operatorI,
                     inputs: {
                         inp: {
                             label: 'In',
@@ -117,7 +117,7 @@ function initFlowchart() {
                 top: initTop2,
                 left: initLeft2,
                 properties: {
-                    title: 'node' + operatorI,
+                    title: 'NODE' + operatorI,
                     inputs: {
                         inp: {
                             label: 'In',
@@ -176,7 +176,7 @@ function newNode1() {
         top: initTop1,
         left: initLeft1,
         properties: {
-            title: 'node' + operatorI,
+            title: 'NODE' + operatorI,
             inputs: {
                 inp: {
                     label: 'In',
@@ -208,7 +208,7 @@ function newNode2() {
         top: initTop2,
         left: initLeft2,
         properties: {
-            title: 'node' + operatorI,
+            title: 'NODE' + operatorI,
             inputs: {
                 inp: {
                     label: 'In',
