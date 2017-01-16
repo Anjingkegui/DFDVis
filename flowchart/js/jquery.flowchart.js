@@ -88,6 +88,8 @@ $(function() {
 
         report: [], // 保存每一次的调用getReturnValue()函数的返回值
 
+        ansObj: {},
+
         // the constructor
         _create: function() {
             if (typeof document.__flowchartNumber == 'undefined') {
@@ -1448,8 +1450,13 @@ $(function() {
                 return 0;
 
             //结果合法
-            else
-                return obj;
+            //返回值需包含 ans 和 dic
+            else {
+                this.ansObj.ans = obj;
+                this.ansObj.dic = {};
+
+                return this.ansObj;
+            }
         }
     });
 });
