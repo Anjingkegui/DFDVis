@@ -4,6 +4,28 @@ function ShowTips(tipStr) {
     $("#errortip").show();
 }
 
+function SendDfdObjToServer(dfdObj) {
+    $.ajax({
+        type: "POST",
+        url: "http://xiongbear.cn:3000/dfdvis",
+        dataType: "json",
+        contentType: "application/json;charset=utf-8",
+        data: JSON.stringify(dfdObj),
+        success: function(data) {
+            console.log("***DFD"+dfdObj.DFDID+" get Response from server successfully***");
+            if(dfdObj.DFDID==1)
+                DFD1GetTheResFromSever($.extend(true, {}, data));
+            if(dfdObj.DFDID==2)
+                DFD1GetTheResFromSever($.extend(true, {}, data));
+        },
+        error: function(message) {
+            ShowTips("It is a failed commit.");
+            console.log("***It is a failed commit***");
+            return 0;
+        }
+    });
+}
+
 $(document).ready(function() {
     //整个页面的初始化部分
 
@@ -99,9 +121,26 @@ $(document).ready(function() {
 
     //btn-submit
     $("#btn-submit").click(function() {
-        flowChartSubmit();
+        var flowChartReturn = flowChartSubmit();
+        if (flowChartReturn != 0) {
+            console.log("***Ready to send to the server***");
+            console.log(flowChartReturn);
+            SendDfdObjToServer(flowChartReturn.dfdDefine1);
+            SendDfdObjToServer(flowChartReturn.dfdDefine2);
+        }
     });
 
     //初始化流图输入
     initFlowchart();
 });
+
+//图1和图2分别得到响应
+function DFD1GetTheResFromSever(resObj)
+{
+    console.log(resObj);
+}
+
+function DFD1GetTheResFromSever(resObj)
+{
+    console.log(resObj);
+}

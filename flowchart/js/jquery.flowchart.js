@@ -88,6 +88,8 @@ $(function() {
 
         report: [], // 保存每一次的调用getReturnValue()函数的返回值
 
+        ansObj: {},
+
         // the constructor
         _create: function() {
             if (typeof document.__flowchartNumber == 'undefined') {
@@ -1307,7 +1309,7 @@ $(function() {
                 this.linkdone();
 
             //submit的时候当前的状态，this.data
-            console.log(this.data);
+            //console.log(this.data);
 
             //link的数据全部处理到this.report中
             //每条边包含name、type、head、tail
@@ -1448,8 +1450,14 @@ $(function() {
                 return 0;
 
             //结果合法
-            else
-                return obj;
+            //返回值需包含 ans 和 dic
+            //dic是字典，名-id的对应，对交互而言意义重大
+            else {
+                this.ansObj.ans = obj;
+                this.ansObj.dic = {};
+
+                return this.ansObj;
+            }
         }
     });
 });

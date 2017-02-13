@@ -4,6 +4,8 @@ var initLeft1 = 20;
 var initTop2 = 20;
 var initLeft2 = 20;
 
+var ansObj = {};
+
 function initFlowchart() {
     //初始化流图输入部分
 
@@ -259,30 +261,38 @@ function mode3Choosen() {
 }
 
 function flowChartSubmit() {
-    var ans1 = $('#flowchartdiv1').flowchart('submit');
+    var ans1 = $.extend(true, {}, $('#flowchartdiv1').flowchart('submit'));
     if (ans1 == 0)
         console.log("******************** bad DFD ********************");
     else {
-        ans1.DFDID = 1;
+        ans1.ans.DFDID = 1;
         console.log("***DFDID***");
-        console.log(ans1.DFDID);
+        console.log(ans1.ans.DFDID);
         console.log("******************** good DFD ********************");
     }
 
-    var ans2 = $('#flowchartdiv2').flowchart('submit');
+    var ans2 = $.extend(true, {}, $('#flowchartdiv2').flowchart('submit'));
     if (ans2 == 0)
         console.log("******************** bad DFD ********************");
     else {
-        ans2.DFDID = 2;
+        ans2.ans.DFDID = 2;
         console.log("***DFDID***");
-        console.log(ans2.DFDID);
+        console.log(ans2.ans.DFDID);
         console.log("******************** good DFD ********************");
     }
 
     //这里return ans1 和 ans2
-
     //还要返回两个图的名字和ID的字典
+    if (ans1 != 0 && ans2 != 0) {
+        var ansObjtoServer = {};
+        ansObjtoServer.dfdDefine1 = ans1.ans;
+        ansObjtoServer.dfdDefine2 = ans2.ans;
+        ansObjtoServer.dic1 = ans1.dic;
+        ansObjtoServer.dic2 = ans2.dic;
 
+        return ansObjtoServer;
+    } else
+        return 0;
 }
 
 //控制接口
@@ -297,36 +307,36 @@ colorOperator: function(operatorId, color)
 unColorOperator: function(operatorId)
 */
 
-function dfd1ColorizeLink(linkId, color)
-{
+//图1
+function dfd1ColorizeLink(linkId, color) {
     $('#flowchartdiv1').flowchart('colorizeLink', linkId, color);
 }
-function dfd1UnColorizeLink(linkId)
-{
+
+function dfd1UnColorizeLink(linkId) {
     $('#flowchartdiv1').flowchart('unColorizeLink', linkId);
 }
-function dfd1ColorOperator(operatorId, color)
-{
+
+function dfd1ColorOperator(operatorId, color) {
     $('#flowchartdiv1').flowchart('colorOperator', operatorId, color);
 }
-function dfd1UnColorOperator(operatorId)
-{
+
+function dfd1UnColorOperator(operatorId) {
     $('#flowchartdiv1').flowchart('unColorOperator', operatorId);
 }
 
-function dfd2ColorizeLink(linkId, color)
-{
+//图2
+function dfd2ColorizeLink(linkId, color) {
     $('#flowchartdiv2').flowchart('colorizeLink', linkId, color);
 }
-function dfd2UnColorizeLink(linkId)
-{
+
+function dfd2UnColorizeLink(linkId) {
     $('#flowchartdiv2').flowchart('unColorizeLink', linkId);
 }
-function dfd2ColorOperator(operatorId, color)
-{
+
+function dfd2ColorOperator(operatorId, color) {
     $('#flowchartdiv2').flowchart('colorOperator', operatorId, color);
 }
-function dfd2UnColorOperator(operatorId)
-{
+
+function dfd2UnColorOperator(operatorId) {
     $('#flowchartdiv2').flowchart('unColorOperator', operatorId);
 }
