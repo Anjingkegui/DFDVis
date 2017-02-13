@@ -1309,7 +1309,7 @@ $(function() {
                 this.linkdone();
 
             //submit的时候当前的状态，this.data
-            console.log(this.data);
+            //console.log(this.data);
 
             //link的数据全部处理到this.report中
             //每条边包含name、type、head、tail
@@ -1451,6 +1451,7 @@ $(function() {
 
             //结果合法
             //返回值需包含 ans 和 dic
+            //dic是字典，名-id的对应，对交互而言意义重大
             else {
                 this.ansObj.ans = obj;
                 this.ansObj.dic = {};

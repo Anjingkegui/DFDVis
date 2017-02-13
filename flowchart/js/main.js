@@ -12,9 +12,11 @@ function SendDfdObjToServer(dfdObj) {
         contentType: "application/json;charset=utf-8",
         data: JSON.stringify(dfdObj),
         success: function(data) {
-            console.log("***Get Response from server successfully***");
-            console.log(data);
-            return data;
+            console.log("***DFD"+dfdObj.DFDID+" get Response from server successfully***");
+            if(dfdObj.DFDID==1)
+                DFD1GetTheResFromSever($.extend(true, {}, data));
+            if(dfdObj.DFDID==2)
+                DFD1GetTheResFromSever($.extend(true, {}, data));
         },
         error: function(message) {
             ShowTips("It is a failed commit.");
@@ -121,13 +123,24 @@ $(document).ready(function() {
     $("#btn-submit").click(function() {
         var flowChartReturn = flowChartSubmit();
         if (flowChartReturn != 0) {
-            var serverRes1 = SendDfdObjToServer(flowChartReturn.dfdDefine1);
-            console.log(serverRes1);
-            var serverRes2 = SendDfdObjToServer(flowChartReturn.dfdDefine2);
-            console.log(serverRes2);
+            console.log("***Ready to send to the server***");
+            console.log(flowChartReturn);
+            SendDfdObjToServer(flowChartReturn.dfdDefine1);
+            SendDfdObjToServer(flowChartReturn.dfdDefine2);
         }
     });
 
     //初始化流图输入
     initFlowchart();
 });
+
+//图1和图2分别得到响应
+function DFD1GetTheResFromSever(resObj)
+{
+    console.log(resObj);
+}
+
+function DFD1GetTheResFromSever(resObj)
+{
+    console.log(resObj);
+}
